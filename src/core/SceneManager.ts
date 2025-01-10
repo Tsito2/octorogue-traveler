@@ -1,14 +1,12 @@
-// @ts-ignore
-import Phaser from "phaser";
-// @ts-ignore
-import MainMenuScene from "../scenes/MainMenuScene";
-// @ts-ignore
-import CombatScene from "../scenes/CombatScene";
-// @ts-ignore
-import DialogueScene from "../scenes/DialogueScene";
+export class SceneManager {
+    currentScene: any;
 
-const scenes = [MainMenuScene, CombatScene, DialogueScene];
+    constructor(initialScene: any) {
+        this.currentScene = initialScene;
+    }
 
-export const initializeScenes = (game: Phaser.Game) => {
-    scenes.forEach((SceneClass) => game.scene.add(SceneClass.name, SceneClass));
-};
+    switchScene(newScene: any): void {
+        this.currentScene = newScene;
+        console.log(`Switched to ${newScene.constructor.name}`);
+    }
+}

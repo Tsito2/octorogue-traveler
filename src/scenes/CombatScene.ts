@@ -1,15 +1,20 @@
-// @ts-ignore
-import Phaser from "phaser";
+import { Hikari } from "../characters/Hikari";
+import { Character } from "../characters/Character";
 
-class CombatScene extends Phaser.Scene {
+export class CombatScene {
+    player: Hikari;
+    enemy: Character;
+
     constructor() {
-        super("CombatScene");
+        this.player = new Hikari();
+        this.enemy = new Character("Enemy", 50, 10, "");
     }
 
-    create() {
-        // @ts-ignore
-        this.add.text(400, 300, "Combat Start!", { font: "24px Arial", color: "#ffffff" }).setOrigin(0.5);
+    startCombat(): void {
+        console.log("Combat starts!");
+        this.player.attack(this.enemy);
+        if (this.enemy.health > 0) {
+            this.enemy.attack(this.player);
+        }
     }
 }
-
-export default CombatScene;
