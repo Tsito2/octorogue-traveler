@@ -2,7 +2,7 @@ import { Character } from "./Character";
 
 export class Hikari extends Character {
     constructor() {
-        super("Hikari", 100, 20, "../assets/characters/Hikari.png");
+        super("Hikari", 100, 20, "/characters/Hikari.png");
     }
 
     specialMove(target: Character): void {
