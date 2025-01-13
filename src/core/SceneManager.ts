@@ -1,12 +1,13 @@
-export class SceneManager {
-    currentScene: any;
+import Phaser from "phaser";
+import MainMenuScene from "../scenes/MainMenuScene";
+import CombatScene from "../scenes/CombatScene";
+import DialogueScene from "../scenes/DialogueScene";
 
-    constructor(initialScene: any) {
-        this.currentScene = initialScene;
-    }
+const scenes = [
+    MainMenuScene,
+    CombatScene,
+    DialogueScene,
+    // Ajoute ici d'autres scènes au fur et à mesure
+];
 
-    switchScene(newScene: any): void {
-        this.currentScene = newScene;
-        console.log(`Switched to ${newScene.constructor.name}`);
-    }
-}
+export default scenes;

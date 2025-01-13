@@ -1,20 +1,24 @@
-import { Hikari } from "../characters/Hikari";
-import { Character } from "../characters/Character";
+import Phaser from "phaser";
 
-export class CombatScene {
-    player: Hikari;
-    enemy: Character;
-
+export default class CombatScene extends Phaser.Scene {
     constructor() {
-        this.player = new Hikari();
-        this.enemy = new Character("Enemy", 50, 10, "");
+        super({ key: "CombatScene" });
     }
 
-    startCombat(): void {
-        console.log("Combat starts!");
-        this.player.attack(this.enemy);
-        if (this.enemy.health > 0) {
-            this.enemy.attack(this.player);
-        }
+    preload(): void {
+        // Précharge des assets si nécessaire
+    }
+
+    create(): void {
+        // Exemple : afficher un message temporaire pour tester
+        this.add.text(400, 300, "Combat Scene", {
+            fontSize: "32px",
+            color: "#fff",
+        }).setOrigin(0.5);
+
+        // Retour au menu principal après un clic
+        this.input.once("pointerdown", () => {
+            this.scene.start("MainMenuScene");
+        });
     }
 }
