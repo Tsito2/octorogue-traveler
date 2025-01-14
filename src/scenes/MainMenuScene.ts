@@ -80,7 +80,7 @@ export default class MainMenuScene extends Phaser.Scene {
         // Action basée sur l'option sélectionnée
         switch (this.selectedIndex) {
             case 0: // Nouvelle Partie
-                this.scene.start("GameScene");
+                this.scene.start("CombatScene");
                 music.stop();
                 break;
             case 1: // Continuer

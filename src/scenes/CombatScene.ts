@@ -1,24 +1,68 @@
 import Phaser from "phaser";
 
 export default class CombatScene extends Phaser.Scene {
+    private actionMenu: Phaser.GameObjects.Text[] = [];
+    private selectedIndex: number = 0;
+
     constructor() {
         super({ key: "CombatScene" });
     }
 
     preload(): void {
-        // Précharge des assets si nécessaire
+        // Charger les assets pour la scène de combat
+        this.load.image("combatBackground", "assets/backgrounds/isle.png");
+        this.load.image("iconSword", "assets/icons/sword.png"); // Icône pour "épée"
+        this.load.image("iconFire", "assets/icons/fire.png");   // Icône pour "feu"
+        this.load.audio("battleTheme", "assets/music/Battle-1.mp3");
     }
 
     create(): void {
-        // Exemple : afficher un message temporaire pour tester
-        this.add.text(400, 300, "Combat Scene", {
-            fontSize: "32px",
-            color: "#fff",
-        }).setOrigin(0.5);
+        // Ajouter un background
+        this.add.image(400, 300, "combatBackground");
 
-        // Retour au menu principal après un clic
-        this.input.once("pointerdown", () => {
-            this.scene.start("MainMenuScene");
+        // Musique de combat
+        const music = this.sound.add("battleTheme", { volume: 0.5, loop: true });
+        music.play();
+
+        // Ajouter des icônes de vulnérabilité
+        this.add.image(200, 100, "iconSword").setScale(0.5);
+        this.add.image(250, 100, "iconFire").setScale(0.5);
+        this.add.text(150, 80, "Vulnerable:", { font: "24px Arial", color: "#ffffff" });
+
+        // Afficher les informations des personnages
+        this.add.text(550, 400, "H'aanit\nHP: 2906/2906\nSP: 95/95", { font: "20px Arial", color: "#ffffff" });
+        this.add.text(550, 480, "Primrose\nHP: 2721/2721\nSP: 217/217", { font: "20px Arial", color: "#ffffff" });
+
+        // Créer le menu d'actions
+        const actions = ["Attack", "Warrior Skills", "Item", "Defend", "Flee"];
+        actions.forEach((action, index) => {
+            const text = this.add.text(100, 300 + index * 40, action, {
+                font: "28px Arial",
+                color: "#ffffff",
+                backgroundColor: index === this.selectedIndex ? "#333333" : "",
+            }).setOrigin(0);
+
+            this.actionMenu.push(text);
         });
+
+        // Ecoute des touches pour naviguer dans le menu
+        this.input.keyboard?.on("keydown-UP", () => this.changeSelection(-1));
+        this.input.keyboard?.on("keydown-DOWN", () => this.changeSelection(1));
+        this.input.keyboard?.on("keydown-ENTER", () => this.selectAction());
+    }
+
+    private changeSelection(delta: number): void {
+        // Changer l'index sélectionné
+        this.selectedIndex = Phaser.Math.Clamp(this.selectedIndex + delta, 0, this.actionMenu.length - 1);
+
+        // Mettre à jour l'apparence des options
+        this.actionMenu.forEach((text, index) => {
+            text.setBackgroundColor(index === this.selectedIndex ? "#333333" : "");
+        });
+    }
+
+    private selectAction(): void {
+        // Réagir à l'action sélectionnée
+        console.log(`Selected: ${this.actionMenu[this.selectedIndex].text}`);
     }
 }
