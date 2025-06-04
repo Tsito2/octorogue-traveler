@@ -4,6 +4,8 @@ export class Character {
     name: string;
     health: number;
     maxHealth: number;
+    sp: number;
+    maxSp: number;
     attackPower: number;
     defense: number;
     speed: number; // Vitesse pour le calcul du tour
@@ -12,6 +14,7 @@ export class Character {
     constructor(
         name: string,
         health: number,
+        sp: number,
         attackPower: number,
         defense: number,
         speed: number,
@@ -20,6 +23,8 @@ export class Character {
         this.name = name;
         this.health = health;
         this.maxHealth = health;
+        this.sp = sp;
+        this.maxSp = sp;
         this.attackPower = attackPower;
         this.defense = defense;
         this.speed = speed;
@@ -40,6 +45,11 @@ export class Character {
         this.health += amount;
         if (this.health > this.maxHealth) this.health = this.maxHealth;
         console.log(`${this.name} récupère ${amount} points de vie !`);
+    }
+
+    useSp(amount: number): void {
+        this.sp -= amount;
+        if (this.sp < 0) this.sp = 0;
     }
 
     attack(target: Character): void {
