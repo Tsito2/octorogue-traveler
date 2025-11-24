@@ -1,93 +1,154 @@
 import Phaser from "phaser";
-import { Character } from "../characters/Character";
+import { CombatEngine } from "../core/combat";
+import { createTestEncounter, EncounterData } from "../core/encounters";
+import { BattleStats } from "../core/stats";
+import { skills } from "../data/skills";
+
+interface CombatSceneData {
+    encounter?: EncounterData;
+}
 
 export default class CombatScene extends Phaser.Scene {
+    private engine!: CombatEngine;
+    private selectedIndex = 0;
     private actionMenu: Phaser.GameObjects.Text[] = [];
     private cursor!: Phaser.GameObjects.Text;
-    private selectedIndex: number = 0;
-    private party: Character[] = [];
+    private logText!: Phaser.GameObjects.Text;
+    private heroText: Phaser.GameObjects.Text[] = [];
+    private enemyText: Phaser.GameObjects.Text[] = [];
+    private currentState: ReturnType<CombatEngine["getState"]> | null = null;
 
     constructor() {
         super({ key: "CombatScene" });
     }
 
+    init(data: CombatSceneData): void {
+        const encounter = data.encounter ?? createTestEncounter();
+        this.engine = new CombatEngine(encounter.heroes, encounter.enemies);
+    }
+
     preload(): void {
-        // Charger les assets pour la scène de combat
         this.load.image("combatBackground", "assets/backgrounds/isle.png");
-        this.load.image("iconSword", "assets/icons/sword.png"); // Icône pour "épée"
-        this.load.image("iconFire", "assets/icons/fire.png");   // Icône pour "feu"
         this.load.audio("battleTheme", "assets/music/Battle-1.mp3");
     }
 
     create(): void {
-        // Ajouter un background
         this.add.image(400, 300, "combatBackground");
-
-        // Créer le groupe de personnages jouables
-        this.party = [
-            new Character("H'aanit", 2906, 95, 200, 50, 10, ""),
-            new Character("Primrose", 2721, 217, 180, 40, 9, ""),
-        ];
-
-        // Afficher les informations de chaque personnage
-        this.party.forEach((char, idx) => {
-            this.add.text(
-                550,
-                400 + idx * 80,
-                `${char.name}\nHP: ${char.health}/${char.maxHealth}\nSP: ${char.sp}/${char.maxSp}`,
-                { font: "20px Arial", color: "#ffffff" }
-            );
-        });
-
-        // Musique de combat
-        const music = this.sound.add("battleTheme", { volume: 0.5, loop: true });
+        const music = this.sound.add("battleTheme", { volume: 0.4, loop: true });
         music.play();
 
-        // Ajouter des icônes de vulnérabilité
-        this.add.image(200, 100, "iconSword").setScale(0.5);
-        this.add.image(250, 100, "iconFire").setScale(0.5);
-        this.add.text(150, 80, "Vulnerable:", { font: "24px Arial", color: "#ffffff" });
+        this.logText = this.add.text(40, 360, "", { font: "16px Arial", color: "#ffffff", wordWrap: { width: 720 } });
+        this.cursor = this.add.text(60, 300, ">", { font: "24px Arial", color: "#ffffff" });
 
-        // Créer le menu d'actions
-        const actions = ["Attack", "Warrior Skills", "Item", "Defend", "Flee"];
-        actions.forEach((action, index) => {
-            const text = this.add.text(100, 300 + index * 40, action, {
-                font: "28px Arial",
-                color: "#ffffff",
-                backgroundColor: index === this.selectedIndex ? "#333333" : "",
-            }).setOrigin(0);
-
-            this.actionMenu.push(text);
-        });
-
-        // Curseur pour indiquer l'option sélectionnée
-        this.cursor = this.add.text(80, 300, ">", {
-            font: "28px Arial",
-            color: "#ffffff",
-        }).setOrigin(0);
-        this.cursor.y = this.actionMenu[this.selectedIndex].y;
-
-        // Ecoute des touches pour naviguer dans le menu
         this.input.keyboard?.on("keydown-UP", () => this.changeSelection(-1));
         this.input.keyboard?.on("keydown-DOWN", () => this.changeSelection(1));
-        this.input.keyboard?.on("keydown-ENTER", () => this.selectAction());
+        this.input.keyboard?.on("keydown-ENTER", () => this.confirmSelection());
+
+        this.refreshState();
+        this.runUntilInput();
+    }
+
+    private refreshState(): void {
+        this.currentState = this.engine.getState();
+        const heroes: BattleStats[] = this.currentState.actors.filter((a) => a.faction === "heroes");
+        const enemies: BattleStats[] = this.currentState.actors.filter((a) => a.faction === "enemies");
+
+        this.heroText.forEach((text) => text.destroy());
+        this.enemyText.forEach((text) => text.destroy());
+        this.actionMenu.forEach((text) => text.destroy());
+        this.heroText = [];
+        this.enemyText = [];
+        this.actionMenu = [];
+
+        heroes.forEach((hero, idx) => {
+            const text = this.add.text(
+                500,
+                380 + idx * 60,
+                `${hero.name}\nHP ${hero.resources.hp}/${hero.stats.maxHP} | SP ${hero.resources.sp}/${hero.stats.maxSP} | BP ${hero.resources.bp}/${hero.resources.maxBP}`,
+                { font: "18px Arial", color: "#ffffff" }
+            );
+            this.heroText.push(text);
+        });
+
+        enemies.forEach((enemy, idx) => {
+            const status = enemy.isBroken ? "(Brisé)" : `Bouclier ${enemy.resources.shield}`;
+            const text = this.add.text(60, 120 + idx * 40, `${enemy.name} ${status} - HP ${enemy.resources.hp}/${enemy.stats.maxHP}`, {
+                font: "20px Arial",
+                color: "#ffffff",
+            });
+            this.enemyText.push(text);
+        });
+
+        this.buildActionMenu();
+        this.renderLog();
+    }
+
+    private buildActionMenu(): void {
+        if (!this.currentState) return;
+        const actor = this.currentState.actors.find((a) => a.id === this.currentState?.turnActorId);
+        const heroSkills = actor?.skillIds ?? [];
+
+        this.selectedIndex = 0;
+        heroSkills.forEach((skillId, index) => {
+            const skillName = skills[skillId]?.name ?? skillId;
+            const text = this.add.text(90, 280 + index * 30, skillName, {
+                font: "20px Arial",
+                color: "#ffffff",
+                backgroundColor: index === this.selectedIndex ? "#333333" : "",
+            });
+            this.actionMenu.push(text);
+        });
+        this.updateCursor();
+    }
+
+    private renderLog(): void {
+        const messages = this.currentState?.log.map((entry) => entry.message).slice(-6) ?? [];
+        this.logText.setText(messages.join("\n"));
     }
 
     private changeSelection(delta: number): void {
-        // Changer l'index sélectionné
+        if (this.actionMenu.length === 0) return;
         this.selectedIndex = Phaser.Math.Clamp(this.selectedIndex + delta, 0, this.actionMenu.length - 1);
-
-        // Mettre à jour l'apparence des options
         this.actionMenu.forEach((text, index) => {
             text.setBackgroundColor(index === this.selectedIndex ? "#333333" : "");
         });
+        this.updateCursor();
+    }
 
-        // Déplacer le curseur à côté de l'option sélectionnée
+    private updateCursor(): void {
+        if (!this.actionMenu[this.selectedIndex]) return;
         this.cursor.y = this.actionMenu[this.selectedIndex].y;
     }
 
-    private selectAction(): void {
-        // Réagir à l'action sélectionnée
-        console.log(`Selected: ${this.actionMenu[this.selectedIndex].text}`);
+    private confirmSelection(): void {
+        if (!this.currentState) return;
+        const actor = this.currentState.actors.find((a) => a.id === this.currentState?.turnActorId);
+        if (!actor) return;
+        const skillId = actor.skillIds[this.selectedIndex];
+        const target = this.currentState.actors.find((a) => a.faction === "enemies" && a.resources.hp > 0);
+        if (!skillId || !target) return;
+
+        this.engine.advanceTurn({ actorId: actor.id, skillId, targetId: target.id, bpSpent: 0 });
+        this.refreshState();
+        this.runUntilInput();
+    }
+
+    private runUntilInput(): void {
+        let turnResult = this.engine.advanceTurn();
+        while (!turnResult.requiresInput && !turnResult.state.victory) {
+            this.currentState = turnResult.state;
+            this.refreshState();
+            turnResult = this.engine.advanceTurn();
+        }
+        this.currentState = turnResult.state;
+        this.refreshState();
+
+        if (this.currentState.victory) {
+            this.add.text(400, 80, this.currentState.victory === "heroes" ? "Victoire !" : "Défaite...", {
+                font: "32px Arial",
+                color: "#ffcc00",
+            }).setOrigin(0.5);
+            this.input.keyboard?.removeAllListeners();
+        }
     }
 }
