@@ -37,7 +37,21 @@ export default class CombatScene extends Phaser.Scene {
         const background = this.add.image(0, 0, "combatBackground").setOrigin(0, 0);
         background.setDisplaySize(this.scale.width, this.scale.height);
         const music = this.sound.add("battleTheme", { volume: 0.4, loop: true });
-        music.play();
+        const startMusic = () => {
+            if (!music.isPlaying) {
+                music.play();
+            }
+        };
+
+        if (this.sound.locked) {
+            this.sound.once(Phaser.Sound.Events.UNLOCKED, startMusic);
+            this.input.once("pointerdown", startMusic);
+            this.input.keyboard?.once("keydown", startMusic);
+        } else {
+            startMusic();
+        }
+
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => music.stop());
 
         this.logText = this.add.text(40, 360, "", { font: "16px Arial", color: "#ffffff", wordWrap: { width: 720 } });
         this.cursor = this.add.text(60, 300, ">", { font: "24px Arial", color: "#ffffff" });

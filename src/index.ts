@@ -6,6 +6,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: 800,
     height: 600,
     backgroundColor: "#3498db",
+    parent: "game-container",
     scene: scenes, // Charger toutes les scènes centralisées
 };
 
