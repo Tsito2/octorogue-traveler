@@ -1,0 +1,16 @@
+[
+  {
+    "id": "warrior",
+    "name": "Champion",
+    "weapons": ["sword", "spear"],
+    "elements": [],
+    "skills": ["basic_attack"]
+  },
+  {
+    "id": "scholar",
+    "name": "Érudit",
+    "weapons": ["staff"],
+    "elements": ["fire", "ice", "lightning"],
+    "skills": ["fireball"]
+  }
+]

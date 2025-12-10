@@ -1,4 +1,4 @@
-import { DamageType, Stats } from "./stats";
+import { DamageType, Resources, Stats } from "./stats";
 
 export interface EnemyTemplate {
     id: string;
@@ -9,6 +9,7 @@ export interface EnemyTemplate {
     shield: number;
     skills: string[];
     ipReward?: number;
+    resourceDefaults?: Partial<Resources>;
 }
 
 export type EnemyDictionary = Record<string, EnemyTemplate>;

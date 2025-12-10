@@ -1,13 +1,11 @@
-import { Stats } from "./stats";
+import { DamageType } from "./stats";
 
 export interface Job {
     id: string;
     name: string;
-    description: string;
-    baseStats: Stats;
+    weapons: DamageType[];
+    elements: DamageType[];
     skills: string[];
-    maxBP: number;
-    bpRegenPerTurn: number;
 }
 
 export type JobDictionary = Record<string, Job>;

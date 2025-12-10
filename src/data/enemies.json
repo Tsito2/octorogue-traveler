@@ -1,0 +1,23 @@
+[
+  {
+    "id": "forest_rat",
+    "name": "Rat des bois",
+    "stats": {
+      "hp": 80,
+      "sp": 0,
+      "bp": 0,
+      "ip": 0,
+      "atk": 18,
+      "mag": 12,
+      "def": 8,
+      "res": 5,
+      "spd": 14,
+      "eva": 5,
+      "acc": 95,
+      "lck": 1
+    },
+    "weaknesses": ["sword", "fire"],
+    "shield": 2,
+    "skills": ["basic_attack"]
+  }
+]

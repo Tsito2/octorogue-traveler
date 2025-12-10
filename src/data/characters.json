@@ -1,0 +1,40 @@
+[
+  {
+    "id": "olberic",
+    "name": "Olberic",
+    "job": "warrior",
+    "stats": {
+      "hp": 120,
+      "sp": 30,
+      "bp": 1,
+      "ip": 0,
+      "atk": 36,
+      "mag": 12,
+      "def": 20,
+      "res": 14,
+      "spd": 18,
+      "eva": 10,
+      "acc": 100,
+      "lck": 5
+    }
+  },
+  {
+    "id": "cyrus",
+    "name": "Cyrus",
+    "job": "scholar",
+    "stats": {
+      "hp": 80,
+      "sp": 42,
+      "bp": 1,
+      "ip": 0,
+      "atk": 12,
+      "mag": 40,
+      "def": 10,
+      "res": 22,
+      "spd": 20,
+      "eva": 8,
+      "acc": 98,
+      "lck": 7
+    }
+  }
+]
