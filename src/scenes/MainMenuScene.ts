@@ -15,8 +15,9 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     create(): void {
-        // Ajouter l'arrière-plan
-        this.add.image(400, 300, "background");
+        // Ajouter et ajuster l'arrière-plan
+        const background = this.add.image(0, 0, "background").setOrigin(0, 0);
+        background.setDisplaySize(this.scale.width, this.scale.height);
 
         // Jouer la musique de fond en boucle
         const music = this.sound.add("mainTheme", { volume: 0.5, loop: true });
