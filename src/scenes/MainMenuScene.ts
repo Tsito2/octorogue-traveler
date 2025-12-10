@@ -21,7 +21,23 @@ export default class MainMenuScene extends Phaser.Scene {
 
         // Jouer la musique de fond en boucle
         const music = this.sound.add("mainTheme", { volume: 0.5, loop: true });
-        music.play();
+        const startMusic = () => {
+            if (!music.isPlaying) {
+                music.play();
+            }
+        };
+
+        // Chrome bloque l'AudioContext avant une interaction utilisateur :
+        // on attend un premier input pour lancer la musique proprement.
+        if (this.sound.locked) {
+            this.input.once("pointerdown", startMusic);
+            this.input.keyboard?.once("keydown", startMusic);
+        } else {
+            startMusic();
+        }
+
+        // S'assurer que la musique s'arrête si la scène change sans passer par selectOption
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => music.stop());
 
         // Ajouter le titre principal
         this.add.text(400, 100, "Octorogue Traveler", {

@@ -24,7 +24,15 @@ module.exports = {
     clean: true,
   },
   devServer: {
-    static: path.resolve(__dirname, 'dist'),
+    static: [
+      // Serve the build output
+      path.resolve(__dirname, 'dist'),
+      // Serve raw assets directly during development to avoid missing files
+      {
+        directory: path.resolve(__dirname, 'assets'),
+        publicPath: '/assets',
+      },
+    ],
     port: 8080,
     hot: true,
   },
