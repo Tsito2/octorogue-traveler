@@ -1,0 +1,22 @@
+[
+  {
+    "id": "basic_attack",
+    "name": "Attaque",
+    "type": "physical",
+    "element": null,
+    "power": 1.0,
+    "spCost": 0,
+    "bpScaling": "power",
+    "target": "single_enemy"
+  },
+  {
+    "id": "fireball",
+    "name": "Boules de Feu",
+    "type": "magical",
+    "element": "fire",
+    "power": 1.4,
+    "spCost": 10,
+    "bpScaling": "power",
+    "target": "single_enemy"
+  }
+]

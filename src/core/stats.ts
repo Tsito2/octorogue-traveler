@@ -1,6 +1,6 @@
 export type DamageType =
     | "sword"
-    | "lance"
+    | "spear"
     | "axe"
     | "bow"
     | "dagger"
@@ -15,14 +15,14 @@ export type DamageType =
 export interface Stats {
     maxHP: number;
     maxSP: number;
-    physicalAttack: number;
-    physicalDefense: number;
-    elementalAttack: number;
-    elementalDefense: number;
-    speed: number;
-    accuracy: number;
-    evasion: number;
-    critRate: number;
+    atk: number;
+    mag: number;
+    def: number;
+    res: number;
+    spd: number;
+    eva: number;
+    acc: number;
+    lck: number;
 }
 
 export interface Resources {
@@ -43,6 +43,8 @@ export interface BattleStats {
     enemyTemplateId?: string;
     stats: Stats;
     resources: Resources;
+    weapons?: DamageType[];
+    elements?: DamageType[];
     weaknesses: DamageType[];
     isBroken: boolean;
     breakTimer: number;
@@ -52,14 +54,14 @@ export interface BattleStats {
 export const defaultStats: Stats = {
     maxHP: 50,
     maxSP: 20,
-    physicalAttack: 10,
-    physicalDefense: 8,
-    elementalAttack: 10,
-    elementalDefense: 8,
-    speed: 10,
-    accuracy: 90,
-    evasion: 10,
-    critRate: 5,
+    atk: 10,
+    mag: 10,
+    def: 8,
+    res: 8,
+    spd: 10,
+    eva: 10,
+    acc: 90,
+    lck: 5,
 };
 
 export const defaultResources: Resources = {
@@ -93,6 +95,8 @@ export function createBattleStats(options: Partial<BattleStats> & { id: string; 
         ...options,
         stats: cloneStats(stats),
         resources,
+        weapons: options.weapons ?? [],
+        elements: options.elements ?? [],
         weaknesses: options.weaknesses ?? ["sword"],
         isBroken: options.isBroken ?? false,
         breakTimer: options.breakTimer ?? 0,

@@ -1,46 +1,10 @@
 import { SkillDictionary } from "../core/skills";
+import skillsJson from "./skills.json";
 
-export const skills: SkillDictionary = {
-    attack: {
-        id: "attack",
-        name: "Attaque",
-        description: "Une attaque physique standard.",
-        power: 10,
-        accuracy: 100,
-        spCost: 0,
-        category: "physical",
-        element: "sword",
-        target: "single-enemy",
-        breakPower: 1,
-        ipGain: 5,
-        bpScaling: 2,
-    },
-    power_slash: {
-        id: "power_slash",
-        name: "Entaille Puissante",
-        description: "Une attaque physique lourde qui consomme du SP.",
-        power: 16,
-        accuracy: 95,
-        spCost: 6,
-        category: "physical",
-        element: "axe",
-        target: "single-enemy",
-        breakPower: 2,
-        ipGain: 8,
-        bpScaling: 3,
-    },
-    fireball: {
-        id: "fireball",
-        name: "Boule de Feu",
-        description: "Inflige des dégâts de feu à une cible unique.",
-        power: 14,
-        accuracy: 98,
-        spCost: 8,
-        category: "elemental",
-        element: "fire",
-        target: "single-enemy",
-        breakPower: 1,
-        ipGain: 10,
-        bpScaling: 2,
-    },
-};
+export const skills: SkillDictionary = skillsJson.reduce((acc, skill) => {
+    acc[skill.id] = {
+        ...skill,
+        tags: skill.element ? [skill.element] : [],
+    } as SkillDictionary[keyof SkillDictionary];
+    return acc;
+}, {} as SkillDictionary);

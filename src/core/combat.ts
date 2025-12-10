@@ -3,6 +3,9 @@ import { skills as skillData } from "../data/skills";
 import { Skill } from "./skills";
 import { calculateDamage, gainIP, spendResources, tickResources } from "./formulas";
 
+const IP_ON_DAMAGE = 5;
+const IP_ON_BREAK = 20;
+
 export interface Action {
     actorId: string;
     skillId: string;
@@ -32,7 +35,15 @@ export class CombatEngine {
 
     public getState(): CombatStateSnapshot {
         return {
-            actors: this.actors.map((actor) => ({ ...actor, stats: { ...actor.stats }, resources: { ...actor.resources }, weaknesses: [...actor.weaknesses], skillIds: [...actor.skillIds] })),
+            actors: this.actors.map((actor) => ({
+                ...actor,
+                stats: { ...actor.stats },
+                resources: { ...actor.resources },
+                weaknesses: [...actor.weaknesses],
+                skillIds: [...actor.skillIds],
+                weapons: actor.weapons ? [...actor.weapons] : undefined,
+                elements: actor.elements ? [...actor.elements] : undefined,
+            })),
             turnActorId: this.getActiveActor().id,
             victory: this.checkVictory(),
             log: [...this.log],
@@ -64,6 +75,11 @@ export class CombatEngine {
     }
 
     private resolveAction(actor: BattleStats, action: Action): void {
+        if (action.skillId === "defend") {
+            this.performDefend(actor);
+            return;
+        }
+
         const skill = this.getSkill(action.skillId);
         const target = this.actors.find((a) => a.id === action.targetId && a.resources.hp > 0);
         const bpSpent = action.bpSpent ?? 0;
@@ -73,23 +89,31 @@ export class CombatEngine {
         }
 
         spendResources(actor, skill, bpSpent);
-        const { hit, damage, isCritical, didBreak } = calculateDamage(actor, target, skill, bpSpent);
+        const { hit, damage, isCritical, didBreak, hitsLanded } = calculateDamage(actor, target, skill, bpSpent);
         if (!hit) {
             this.log.push({ message: `${actor.name} utilise ${skill.name} mais manque ${target.name}.` });
             return;
         }
 
         target.resources.hp = clampResource(target.resources.hp - damage, target.stats.maxHP);
-        gainIP(actor, skill.ipGain ?? 0);
-        gainIP(target, 3);
+        gainIP(target, IP_ON_DAMAGE);
+        if (didBreak) {
+            gainIP(actor, IP_ON_BREAK);
+        }
 
         const critText = isCritical ? " (critique)" : "";
         const breakText = didBreak ? " – Rupture !" : "";
-        this.log.push({ message: `${actor.name} utilise ${skill.name} et inflige ${damage} dégâts à ${target.name}${critText}${breakText}.` });
+        const hitsText = hitsLanded > 1 ? ` x${hitsLanded}` : "";
+        this.log.push({ message: `${actor.name} utilise ${skill.name}${hitsText} et inflige ${damage} dégâts à ${target.name}${critText}${breakText}.` });
 
         if (target.resources.hp <= 0) {
             this.log.push({ message: `${target.name} est vaincu !` });
         }
+    }
+
+    private performDefend(actor: BattleStats): void {
+        actor.resources.bp = clampResource(actor.resources.bp + 1, actor.resources.maxBP);
+        this.log.push({ message: `${actor.name} se défend et prépare sa prochaine action.` });
     }
 
     private endTurn(): void {
