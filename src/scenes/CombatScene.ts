@@ -28,12 +28,14 @@ export default class CombatScene extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.image("combatBackground", "assets/backgrounds/isle.png");
-        this.load.audio("battleTheme", "assets/music/Battle-1.mp3");
+        // Utilise les assets déjà présents pour éviter les erreurs de chargement
+        this.load.image("combatBackground", "assets/backgrounds/background2.jpg");
+        this.load.audio("battleTheme", "assets/music/Main-Theme.mp3");
     }
 
     create(): void {
-        this.add.image(400, 300, "combatBackground");
+        const background = this.add.image(0, 0, "combatBackground").setOrigin(0, 0);
+        background.setDisplaySize(this.scale.width, this.scale.height);
         const music = this.sound.add("battleTheme", { volume: 0.4, loop: true });
         music.play();
 
