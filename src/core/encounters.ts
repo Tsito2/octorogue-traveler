@@ -40,15 +40,17 @@ export function createHeroFromTemplate(templateId: string): BattleStats {
             hp: stats.maxHP,
             sp: stats.maxSP,
             bp: template.stats.bp,
-            ip: template.stats.ip,
+            lp: template.stats.lp,
             shield: 4,
-            maxBP: 5,
-            maxIP: 100,
+            maxBP: job?.maxBP ?? 5,
+            maxLP: 100,
         },
         weaknesses: job?.weapons ?? ["sword"],
         weapons: job?.weapons,
         elements: job?.elements,
         skillIds: heroSkills,
+        row: job?.preferredRow ?? "front",
+        spriteKey: template.spriteKey,
     });
 }
 
@@ -64,19 +66,40 @@ export function createEnemyFromTemplate(templateId: keyof typeof enemyTemplates)
             hp: template.stats.maxHP,
             sp: template.stats.maxSP,
             bp: template.resourceDefaults?.bp ?? 0,
-            ip: template.resourceDefaults?.ip ?? 0,
+            lp: template.resourceDefaults?.lp ?? 0,
             shield: template.shield,
             maxBP: 0,
-            maxIP: 100,
+            maxLP: 100,
         },
         weaknesses: template.weaknesses,
         skillIds: template.skills,
+        spriteKey: template.spriteKey,
     });
 }
 
 export function createTestEncounter(): EncounterData {
-    const heroes = [createHeroFromTemplate("olberic"), createHeroFromTemplate("cyrus")];
+    // Roster v0.1 : 4 héros formant deux duos.
+    const ochette = createHeroFromTemplate("ochette");
+    const hikari = createHeroFromTemplate("hikari");
+    const agnea = createHeroFromTemplate("agnea");
+    const castti = createHeroFromTemplate("castti");
 
+    // Duo 1 : Hikari (guerrière, front) + Agnea (danseuse, front) — les deux rangées alignées à l'avant,
+    // le Duo Combo est donc immédiatement jouable sans Swap préalable.
+    hikari.row = "front";
+    agnea.row = "front";
+    hikari.duoPartnerId = agnea.id;
+    agnea.duoPartnerId = hikari.id;
+
+    // Duo 2 : Ochette (chasseuse, back) + Castti (apothicaire, back) — les deux rangées alignées à l'arrière :
+    // un seul Swap suffit à amener le duo au front et débloquer le Duo Combo, ce qui permet de tester
+    // la mécanique de Swap (performSwap bascule les deux rangées du duo simultanément) dès le premier tour.
+    ochette.row = "back";
+    castti.row = "back";
+    ochette.duoPartnerId = castti.id;
+    castti.duoPartnerId = ochette.id;
+
+    const heroes = [hikari, agnea, ochette, castti];
     const enemies = [createEnemyFromTemplate("forest_rat")];
 
     return { heroes, enemies };

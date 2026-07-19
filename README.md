@@ -16,18 +16,30 @@ Octorogue Traveler est un jeu en 2D réalisé avec le framework **Phaser 3**. Le
     - Gestion des transitions entre le menu principal, les scènes de jeu (“GameScene”), de dialogue (“DialogueScene”), et de combat (“CombatScene”).
 
 ## Structure du projet
-Voici la structure actuelle du projet :
+Voici la structure actuelle du projet (module de combat actif uniquement — l'ancien module orphelin dupliqué a été supprimé) :
 
 ```
 octoroguetraveler/
 ├── assets/
 │   ├── backgrounds/
-│   │   └── menu-bg.png
+│   │   └── background2.jpg
 │   ├── music/
 │   │   └── Main-Theme.mp3
 ├── src/
 │   ├── core/
-│   │   └── SceneManager.ts
+│   │   ├── SceneManager.ts
+│   │   ├── combat.ts
+│   │   ├── encounters.ts
+│   │   ├── enemies.ts
+│   │   ├── formulas.ts
+│   │   ├── jobs.ts
+│   │   ├── skills.ts
+│   │   └── stats.ts
+│   ├── data/
+│   │   ├── characters.json / characters.ts
+│   │   ├── enemies.json / enemies.ts
+│   │   ├── jobs.json / jobs.ts
+│   │   └── skills.json / skills.ts
 │   ├── scenes/
 │   │   ├── MainMenuScene.ts
 │   │   ├── GameScene.ts
@@ -42,14 +54,21 @@ octoroguetraveler/
 ### Détails des fichiers principaux
 
 #### 1. **assets/**
-- **backgrounds/menu-bg.png** : Image de fond utilisée dans le menu principal.
-- **music/Main-Theme.mp3** : Musique de fond jouée dans le menu principal.
+- **backgrounds/background2.jpg** : Image de fond utilisée dans le menu principal et en combat.
+- **music/Main-Theme.mp3** : Musique de fond jouée dans le menu principal et en combat.
 
-#### 2. **src/core/SceneManager.ts**
-- Gère la transition et la configuration des différentes scènes du jeu.
-- Importe les scènes définies dans le dossier `scenes/` et les initialise.
+#### 2. **src/core/**
+- **SceneManager.ts** : gère la transition et la configuration des différentes scènes du jeu ; importe les scènes définies dans `scenes/` et les initialise.
+- **stats.ts** : types de statistiques et de ressources de combat (`Stats`, `Resources`, `BattleStats`), y compris le Pouvoir Latent (`lp` / `maxLP`).
+- **skills.ts**, **jobs.ts**, **enemies.ts** : types de données pour les compétences, classes et ennemis.
+- **formulas.ts** : calculs purs de combat (dégâts, précision/esquive, critique, Break, gain de Pouvoir Latent).
+- **combat.ts** : `CombatEngine`, orchestrateur du tour par tour.
+- **encounters.ts** : assemble les templates de données (`data/`) en combattants de combat (`BattleStats`).
 
-#### 3. **src/scenes/**
+#### 3. **src/data/**
+- Données JSON de contenu (personnages, ennemis, classes, compétences), chacune accompagnée d'un wrapper TypeScript qui la type et l'indexe par `id`.
+
+#### 4. **src/scenes/**
 - **MainMenuScene.ts** :
     - Gère l’interface du menu principal, y compris les options, la navigation, et la musique de fond.
     - Permet de naviguer vers la “GameScene” avec la sélection “Nouvelle Partie”.
@@ -59,9 +78,9 @@ octoroguetraveler/
 - **DialogueScene.ts** :
     - Placeholder pour les scènes de dialogue avec des personnages (à compléter).
 - **CombatScene.ts** :
-    - Placeholder pour les scènes de combat (à compléter).
+    - Scène de combat au tour par tour, pilotée par `core/combat.ts::CombatEngine`.
 
-#### 4. **src/index.ts**
+#### 5. **src/index.ts**
 - Point d’entrée principal de l’application.
 - Configure Phaser avec les paramètres de base, comme les dimensions de l’écran et le mode de rendu.
 

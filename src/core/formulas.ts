@@ -57,7 +57,7 @@ export function applyBreak(defender: BattleStats, skill: Skill, attacker?: Battl
     const matchesWeakness = tags.some((tag) => defender.weaknesses.includes(tag));
     if (!matchesWeakness) return false;
 
-    defender.resources.shield = clampResource(defender.resources.shield - 1, Infinity);
+    defender.resources.shield = clampResource(defender.resources.shield - skill.breakPower, Infinity);
     if (defender.resources.shield <= 0) {
         defender.isBroken = true;
         defender.breakTimer = 2;
@@ -83,8 +83,8 @@ export function spendResources(actor: BattleStats, skill: Skill, bpSpent: number
     actor.resources.bp = clampResource(actor.resources.bp - bpSpent, actor.resources.maxBP);
 }
 
-export function gainIP(actor: BattleStats, amount: number): void {
-    actor.resources.ip = clampResource(actor.resources.ip + amount, actor.resources.maxIP);
+export function gainLP(actor: BattleStats, amount: number): void {
+    actor.resources.lp = clampResource(actor.resources.lp + amount, actor.resources.maxLP);
 }
 
 function buildSkillTags(skill: Skill, attacker?: BattleStats): DamageType[] {

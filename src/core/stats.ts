@@ -29,10 +29,10 @@ export interface Resources {
     hp: number;
     sp: number;
     bp: number;
-    ip: number;
+    lp: number;
     shield: number;
     maxBP: number;
-    maxIP: number;
+    maxLP: number;
 }
 
 export interface BattleStats {
@@ -49,6 +49,12 @@ export interface BattleStats {
     isBroken: boolean;
     breakTimer: number;
     skillIds: string[];
+    /** Rangée de formation actuelle (mécanique de Swap de Duo). */
+    row: "front" | "back";
+    /** Id du partenaire de duo (pour le Swap et le Duo Combo), le cas échéant. */
+    duoPartnerId?: string;
+    /** Clé de spritesheet à utiliser pour l'affichage (voir PreloadScene + AnimationManager). Absent = pas de sprite réel (ex. ennemis pour l'instant). */
+    spriteKey?: string;
 }
 
 export const defaultStats: Stats = {
@@ -68,10 +74,10 @@ export const defaultResources: Resources = {
     hp: defaultStats.maxHP,
     sp: defaultStats.maxSP,
     bp: 1,
-    ip: 0,
+    lp: 0,
     shield: 3,
     maxBP: 5,
-    maxIP: 100,
+    maxLP: 100,
 };
 
 export function cloneStats(stats: Stats): Stats {
@@ -101,5 +107,7 @@ export function createBattleStats(options: Partial<BattleStats> & { id: string; 
         isBroken: options.isBroken ?? false,
         breakTimer: options.breakTimer ?? 0,
         skillIds: options.skillIds ?? [],
+        row: options.row ?? "front",
+        duoPartnerId: options.duoPartnerId,
     };
 }

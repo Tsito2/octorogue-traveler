@@ -4,7 +4,7 @@ export interface CharacterTemplateStats {
     hp: number;
     sp: number;
     bp: number;
-    ip: number;
+    lp: number;
     atk: number;
     mag: number;
     def: number;
@@ -20,6 +20,8 @@ export interface CharacterTemplate {
     name: string;
     job: string;
     stats: CharacterTemplateStats;
+    /** Clé de la texture/spritesheet à charger (voir PreloadScene + AnimationManager), ex. "spr_hikari". */
+    spriteKey: string;
 }
 
 export const characters = charactersJson as CharacterTemplate[];

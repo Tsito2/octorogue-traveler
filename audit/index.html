@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Audit — Octorogue Traveler</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#0b0e14;
+    --bg-panel:#12161f;
+    --bg-panel-2:#171c27;
+    --border:#242b3a;
+    --text:#e6e9f0;
+    --text-dim:#9aa3b5;
+    --accent:#4a90e2;
+    --accent-2:#8e6bf0;
+    --green:#3ecf8e;
+    --yellow:#e2b93b;
+    --red:#e2564a;
+    --orange:#e2884a;
+    --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    line-height:1.55;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px;}
+  header.top{
+    padding:40px 24px;
+    background:radial-gradient(1200px 400px at 20% -10%, rgba(74,144,226,0.18), transparent),
+               radial-gradient(1000px 400px at 90% -20%, rgba(142,107,240,0.15), transparent),
+               var(--bg-panel);
+    border-bottom:1px solid var(--border);
+  }
+  header.top .inner{max-width:1180px;margin:0 auto;}
+  .eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:600;}
+  h1{font-size:32px;margin:8px 0 6px;}
+  .subtitle{color:var(--text-dim);font-size:15px;margin-bottom:22px;}
+  .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--bg-panel-2);border:1px solid var(--border);
+    padding:6px 12px;border-radius:999px;font-size:13px;color:var(--text-dim);
+  }
+  .progress-global{max-width:520px;}
+  .progress-global .label{display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim);margin-bottom:6px;}
+  .bar{height:10px;background:var(--bg);border:1px solid var(--border);border-radius:999px;overflow:hidden;}
+  .bar > span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+
+  h2{font-size:22px;margin:56px 0 6px;border-bottom:1px solid var(--border);padding-bottom:12px;}
+  h2 .num{color:var(--accent);margin-right:8px;}
+  h3{font-size:16px;margin:26px 0 10px;color:var(--text);}
+  p{color:var(--text-dim);}
+  p.lead{color:var(--text);font-size:15px;}
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px;
+  }
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px;}
+  .stat-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;
+  }
+  .stat-card .value{font-size:26px;font-weight:700;color:var(--text);}
+  .stat-card .label{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
+
+  .domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px;}
+  .domain-card{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+  .domain-card .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .domain-card .name{font-size:14px;color:var(--text);font-weight:600;}
+  .domain-card .pct{font-size:14px;color:var(--accent);font-weight:700;}
+  .domain-card .bar{margin-bottom:8px;}
+  .domain-card .why{font-size:12.5px;color:var(--text-dim);}
+
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--text-dim);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;}
+  td{color:var(--text);}
+  td.dim, span.dim{color:var(--text-dim);}
+  tr:last-child td{border-bottom:none;}
+
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;}
+  .status.ok{color:var(--green);}
+  .status.mid{color:var(--yellow);}
+  .status.no{color:var(--red);}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;}
+  .pill.crit{background:rgba(226,86,74,.15);color:var(--red);border:1px solid rgba(226,86,74,.35);}
+  .pill.high{background:rgba(226,136,74,.15);color:var(--orange);border:1px solid rgba(226,136,74,.35);}
+  .pill.mid{background:rgba(226,185,59,.15);color:var(--yellow);border:1px solid rgba(226,185,59,.35);}
+  .pill.low{background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.35);}
+
+  .grade-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:16px;}
+  .grade-card{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+  .grade-card .score{font-size:30px;font-weight:800;color:var(--accent);}
+  .grade-card .criterion{font-size:13px;color:var(--text-dim);margin-top:4px;}
+
+  .callout{
+    border-left:3px solid var(--accent);background:var(--bg-panel-2);
+    padding:14px 16px;border-radius:6px;margin:16px 0;color:var(--text-dim);font-size:14px;
+  }
+  .callout.warn{border-left-color:var(--red);}
+  .callout.good{border-left-color:var(--green);}
+
+  ul{color:var(--text-dim);}
+  li{margin-bottom:6px;}
+
+  svg text{fill:var(--text);font-family:var(--font);}
+  .diagram-wrap{overflow-x:auto;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px;}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-dim);font-size:12.5px;}
+
+  code{background:var(--bg-panel-2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="eyebrow">Audit technique documentaire</div>
+    <h1>Octorogue Traveler</h1>
+    <div class="subtitle">RPG 2D en Phaser 3 / TypeScript — état des lieux du dépôt au 19 juillet 2026</div>
+    <div class="badge-row">
+      <span class="badge">43 fichiers analysés</span>
+      <span class="badge">≈ 1 467 lignes TypeScript</span>
+      <span class="badge">17 classes · 16 interfaces</span>
+      <span class="badge">4 scènes Phaser</span>
+      <span class="badge">2 assets binaires</span>
+    </div>
+    <div class="progress-global">
+      <div class="label"><span>Progression globale estimée</span><span>≈ 22 %</span></div>
+      <div class="bar"><span style="width:22%"></span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2><span class="num">01</span>Résumé</h2>
+  <p class="lead">Octorogue Traveler est un prototype technique vertical : une tranche jouable de bout en bout (menu → combat de démonstration) repose sur un moteur de combat au tour par tour déjà relativement riche (dégâts physiques/magiques, critiques, précision/esquive, Break/bouclier, Boost Points, Influence Points). Le dépôt contient cependant <strong>deux systèmes de combat parallèles</strong> : un module actif et connecté (<code>src/core/</code> + <code>src/scenes/</code>), et un module orphelin plus ancien (<code>src/characters/</code>, une partie de <code>src/combat/</code>, <code>src/ui/</code>) qui n'est importé par aucun fichier exécuté. Le contenu de jeu reste minimal (2 héros, 1 ennemi, 2 compétences, 1 décor, 1 musique) et plusieurs pans entiers du jeu visé sont absents : exploration, dialogues accessibles, sauvegarde, progression, inventaire.</p>
+
+  <div class="callout warn">
+    <strong>Point d'attention principal :</strong> le module orphelin (<code>characters/</code>, une partie de <code>combat/</code>, <code>ui/</code>) duplique le moteur de combat actif avec une API différente. Aucun fichier de <code>src/index.ts</code> ne l'importe — c'est du code mort qui augmente la dette technique et le risque de confusion.
+  </div>
+
+  <h2><span class="num">02</span>Statistiques</h2>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="value">43</div><div class="label">Fichiers (hors dépendances)</div></div>
+    <div class="stat-card"><div class="value">29</div><div class="label">Fichiers TypeScript</div></div>
+    <div class="stat-card"><div class="value">≈1 467</div><div class="label">Lignes de TypeScript</div></div>
+    <div class="stat-card"><div class="value">17</div><div class="label">Classes</div></div>
+    <div class="stat-card"><div class="value">16</div><div class="label">Interfaces</div></div>
+    <div class="stat-card"><div class="value">6</div><div class="label">Alias de type</div></div>
+    <div class="stat-card"><div class="value">4</div><div class="label">Scènes Phaser</div></div>
+    <div class="stat-card"><div class="value">4</div><div class="label">Fichiers JSON de données</div></div>
+    <div class="stat-card"><div class="value">7</div><div class="label">Entrées de contenu (héros+ennemis+jobs+skills)</div></div>
+    <div class="stat-card"><div class="value">2</div><div class="label">Assets binaires (1 image, 1 audio)</div></div>
+    <div class="stat-card"><div class="value">10</div><div class="label">Systèmes identifiés</div></div>
+    <div class="stat-card"><div class="value">8</div><div class="label">Dépendances npm (1 prod + 7 dev)</div></div>
+    <div class="stat-card"><div class="value">0</div><div class="label">TODO / FIXME trouvés</div></div>
+    <div class="stat-card"><div class="value">0</div><div class="label">Tests automatisés</div></div>
+  </div>
+
+  <h3>Progression estimée par domaine</h3>
+  <div class="domain-grid">
+    <div class="domain-card">
+      <div class="top"><span class="name">Architecture</span><span class="pct">55%</span></div>
+      <div class="bar"><span style="width:55%"></span></div>
+      <div class="why">Séparation données/logique/scènes posée pour le combat ; module orphelin non tranché.</div>
+    </div>
+    <div class="domain-card">
+      <div class="top"><span class="name">Gameplay</span><span class="pct">20%</span></div>
+      <div class="bar"><span style="width:20%"></span></div>
+      <div class="why">Boucle de combat jouable ; aucune exploration ni progression.</div>
+    </div>
+    <div class="domain-card">
+      <div class="top"><span class="name">Interface</span><span class="pct">15%</span></div>
+      <div class="bar"><span style="width:15%"></span></div>
+      <div class="why">HUD fonctionnel mais géométrique ; pas de ciblage, pas d'options.</div>
+    </div>
+    <div class="domain-card">
+      <div class="top"><span class="name">Contenu</span><span class="pct">5%</span></div>
+      <div class="bar"><span style="width:5%"></span></div>
+      <div class="why">2 héros, 1 ennemi, 2 compétences, 1 décor, 1 musique.</div>
+    </div>
+    <div class="domain-card">
+      <div class="top"><span class="name">Data (structures)</span><span class="pct">45%</span></div>
+      <div class="bar"><span style="width:45%"></span></div>
+      <div class="why">Modèles riches et extensibles ; volume de données très faible.</div>
+    </div>
+    <div class="domain-card" style="border-color:var(--accent);">
+      <div class="top"><span class="name">Projet global</span><span class="pct">≈22%</span></div>
+      <div class="bar"><span style="width:22%"></span></div>
+      <div class="why">Moteur de combat avancé ; le reste du jeu reste très majoritairement à construire.</div>
+    </div>
+  </div>
+
+  <h2><span class="num">03</span>Architecture</h2>
+  <p>Le dépôt sépare un module actif (câblé depuis <code>src/index.ts</code>) d'un module orphelin (jamais importé). Le diagramme ci-dessous résume les dépendances principales.</p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1080 460" width="100%" height="460" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5b6478"/>
+        </marker>
+      </defs>
+      <!-- active module -->
+      <rect x="20" y="20" width="640" height="300" rx="10" fill="#12161f" stroke="#242b3a"/>
+      <text x="36" y="42" font-size="12" fill="#9aa3b5">MODULE ACTIF (importé par src/index.ts)</text>
+
+      <rect x="40" y="56" width="140" height="40" rx="6" fill="#171c27" stroke="#4a90e2"/>
+      <text x="110" y="80" font-size="12" text-anchor="middle">index.ts</text>
+
+      <rect x="220" y="56" width="160" height="40" rx="6" fill="#171c27" stroke="#4a90e2"/>
+      <text x="300" y="80" font-size="12" text-anchor="middle">SceneManager</text>
+
+      <rect x="420" y="56" width="220" height="40" rx="6" fill="#171c27" stroke="#4a90e2"/>
+      <text x="530" y="80" font-size="12" text-anchor="middle">4 scènes Phaser</text>
+
+      <rect x="40" y="150" width="150" height="40" rx="6" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="115" y="174" font-size="12" text-anchor="middle">CombatScene</text>
+
+      <rect x="230" y="150" width="180" height="40" rx="6" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="320" y="174" font-size="12" text-anchor="middle">CombatEngine</text>
+
+      <rect x="450" y="150" width="180" height="40" rx="6" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="540" y="174" font-size="12" text-anchor="middle">formulas.ts</text>
+
+      <rect x="40" y="230" width="150" height="40" rx="6" fill="#171c27" stroke="#3ecf8e"/>
+      <text x="115" y="254" font-size="12" text-anchor="middle">encounters.ts</text>
+
+      <rect x="230" y="230" width="400" height="40" rx="6" fill="#171c27" stroke="#3ecf8e"/>
+      <text x="430" y="254" font-size="12" text-anchor="middle">data/*.json + data/*.ts (characters, enemies, jobs, skills)</text>
+
+      <!-- arrows active -->
+      <line x1="180" y1="76" x2="220" y2="76" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="380" y1="76" x2="420" y2="76" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="530" y1="96" x2="530" y2="140" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="530" y1="150" x2="410" y2="170" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="230" y1="170" x2="190" y2="170" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="320" y1="190" x2="320" y2="230" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="115" y1="190" x2="115" y2="230" stroke="#5b6478" marker-end="url(#arrow)"/>
+      <line x1="190" y1="250" x2="230" y2="250" stroke="#5b6478" marker-end="url(#arrow)"/>
+
+      <!-- orphan module -->
+      <rect x="700" y="20" width="360" height="420" rx="10" fill="#241717" stroke="#e2564a"/>
+      <text x="716" y="42" font-size="12" fill="#e2887f">MODULE ORPHELIN (non importé — code mort)</text>
+
+      <rect x="720" y="60" width="140" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="790" y="82" font-size="11" text-anchor="middle">Character.ts</text>
+
+      <rect x="900" y="60" width="140" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="970" y="82" font-size="11" text-anchor="middle">Hikari.ts</text>
+
+      <rect x="720" y="120" width="140" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="790" y="142" font-size="11" text-anchor="middle">Enemy.ts</text>
+
+      <rect x="900" y="120" width="140" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="970" y="142" font-size="11" text-anchor="middle">Party.ts</text>
+
+      <rect x="720" y="180" width="320" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="880" y="202" font-size="11" text-anchor="middle">BattleManager.ts</text>
+
+      <rect x="720" y="230" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="795" y="252" font-size="11" text-anchor="middle">TurnOrderCalculator</text>
+
+      <rect x="890" y="230" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="965" y="252" font-size="11" text-anchor="middle">ActionResolver</text>
+
+      <rect x="720" y="280" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="795" y="302" font-size="11" text-anchor="middle">DamageCalculator</text>
+
+      <rect x="890" y="280" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="965" y="302" font-size="11" text-anchor="middle">BattleEvents</text>
+
+      <rect x="720" y="330" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="795" y="352" font-size="11" text-anchor="middle">StatusEffect</text>
+
+      <rect x="890" y="330" width="150" height="36" rx="6" fill="#2a1a1a" stroke="#e2564a"/>
+      <text x="965" y="352" font-size="11" text-anchor="middle">HUD / DialogueBox</text>
+
+      <text x="880" y="400" font-size="11" fill="#9aa3b5" text-anchor="middle">Aucune flèche entrante depuis le module actif —</text>
+      <text x="880" y="416" font-size="11" fill="#9aa3b5" text-anchor="middle">jamais exécuté par le jeu</text>
+    </svg>
+  </div>
+
+  <h3>Navigation entre scènes</h3>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1080 220" width="100%" height="220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5b6478"/>
+        </marker>
+      </defs>
+      <rect x="20" y="70" width="180" height="60" rx="10" fill="#171c27" stroke="#4a90e2"/>
+      <text x="110" y="105" font-size="13" text-anchor="middle">MainMenuScene</text>
+
+      <rect x="280" y="70" width="180" height="60" rx="10" fill="#171c27" stroke="#4a90e2"/>
+      <text x="370" y="98" font-size="13" text-anchor="middle">GameScene</text>
+      <text x="370" y="114" font-size="10" fill="#9aa3b5" text-anchor="middle">(pass-through auto)</text>
+
+      <rect x="540" y="70" width="200" height="60" rx="10" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="640" y="98" font-size="13" text-anchor="middle">CombatScene</text>
+      <text x="640" y="114" font-size="10" fill="#9aa3b5" text-anchor="middle">Victoire/Défaite (sans suite)</text>
+
+      <rect x="820" y="20" width="220" height="60" rx="10" fill="#241717" stroke="#e2564a"/>
+      <text x="930" y="48" font-size="13" text-anchor="middle">DialogueScene</text>
+      <text x="930" y="64" font-size="10" fill="#e2887f" text-anchor="middle">jamais démarrée par le jeu</text>
+
+      <line x1="200" y1="100" x2="280" y2="100" stroke="#5b6478" marker-end="url(#arrow2)"/>
+      <text x="240" y="92" font-size="10" fill="#9aa3b5" text-anchor="middle">Nouvelle Partie</text>
+
+      <line x1="460" y1="100" x2="540" y2="100" stroke="#5b6478" marker-end="url(#arrow2)"/>
+      <text x="500" y="92" font-size="10" fill="#9aa3b5" text-anchor="middle">auto</text>
+
+      <path d="M110,130 C60,170 60,170 110,130" fill="none" stroke="#5b6478"/>
+      <text x="110" y="185" font-size="10" fill="#9aa3b5" text-anchor="middle">Continuer / Options → stub console.log</text>
+    </svg>
+  </div>
+
+  <h2><span class="num">04</span>Fonctionnalités</h2>
+  <p>État détaillé par fonctionnalité — voir <code>gameplay.md</code> pour la liste complète. Extrait des points structurants :</p>
+  <table>
+    <thead><tr><th>Fonctionnalité</th><th>État</th><th>Détail</th></tr></thead>
+    <tbody>
+      <tr><td>Menu principal (navigation, musique)</td><td><span class="status ok">● Terminée</span></td><td>Navigation clavier et surbrillance fonctionnelles</td></tr>
+      <tr><td>Option Continuer / Options</td><td><span class="status no">● Absente</span></td><td>Stubs <code>console.log</code> uniquement</td></tr>
+      <tr><td>Exploration (GameScene)</td><td><span class="status no">● Absente</span></td><td>Redirige immédiatement vers le combat</td></tr>
+      <tr><td>Scène de dialogue</td><td><span class="status mid">● Partielle</span></td><td>Fonctionnelle mais jamais atteinte en jeu</td></tr>
+      <tr><td>Boucle de combat (tours, dégâts, Break)</td><td><span class="status ok">● Terminée</span></td><td>Cœur du moteur solide et fonctionnel</td></tr>
+      <tr><td>Sélection de cible par le joueur</td><td><span class="status no">● Absente</span></td><td>Ciblage toujours automatique sur le 1er ennemi vivant</td></tr>
+      <tr><td>Dépense de BP côté joueur</td><td><span class="status mid">● Partielle</span></td><td>Moteur complet, jamais exposé dans l'UI (<code>bpSpent</code> toujours à 0)</td></tr>
+      <tr><td>Utilisation des IP</td><td><span class="status mid">● Partielle</span></td><td>Accumulés, jamais affichés ni consommés</td></tr>
+      <tr><td>Statuts (poison, stun...)</td><td><span class="status no">● Absente</span></td><td>Existe seulement dans le module orphelin</td></tr>
+      <tr><td>Victoire / Défaite</td><td><span class="status mid">● Partielle</span></td><td>Détectées et affichées, sans suite programmée</td></tr>
+      <tr><td>Sauvegarde</td><td><span class="status no">● Absente</span></td><td>Aucun mécanisme trouvé</td></tr>
+      <tr><td>Tests automatisés</td><td><span class="status no">● Absente</span></td><td><code>npm test</code> est un stub qui échoue volontairement</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">05</span>Dette technique</h2>
+  <ul>
+    <li><strong>Code mort :</strong> module <code>characters/</code> + <code>combat/*</code> (hors scènes) + <code>ui/</code>, jamais importé par <code>src/index.ts</code>, duplique le moteur de combat actif.</li>
+    <li><strong>Documentation désynchronisée :</strong> <code>README.md</code> racine décrit une arborescence obsolète et référence un asset (<code>menu-bg.png</code>) qui n'existe pas.</li>
+    <li><strong>CI probablement inactive :</strong> <code>config.yaml</code> est à la racine du dépôt au lieu de <code>.github/workflows/</code> ; le script <code>lint</code> qu'il implique n'existe pas dans <code>package.json</code>.</li>
+    <li><strong>Cas spécial hors donnée :</strong> l'action <code>"defend"</code> est codée en dur dans <code>CombatEngine.resolveAction</code> plutôt que définie dans <code>skills.json</code>, cassant l'homogénéité du système data-driven.</li>
+    <li><strong>Absence totale de tests</strong> alors que <code>formulas.ts</code>/<code>combat.ts</code> contiennent la logique la plus critique (calculs de dégâts, Break) et sont facilement testables unitairement.</li>
+    <li><strong>BP et IP invisibles/inutilisés côté joueur</strong> malgré une implémentation moteur complète — écart entre le potentiel du moteur et l'expérience réellement jouable.</li>
+  </ul>
+
+  <h2><span class="num">06</span>Roadmap priorisée</h2>
+  <table>
+    <thead><tr><th>Priorité</th><th>Tâche</th><th>Difficulté</th><th>Impact</th><th>Dépendances</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill crit">🔴 Critique</span></td><td>Statuer sur le module orphelin (supprimer/déplacer/documenter)</td><td>Faible</td><td>Élevé</td><td>Aucune</td></tr>
+      <tr><td><span class="pill crit">🔴 Critique</span></td><td>Réécrire le README pour refléter l'architecture réelle</td><td>Faible</td><td>Élevé</td><td>Après tri du module orphelin</td></tr>
+      <tr><td><span class="pill crit">🔴 Critique</span></td><td>Corriger ou retirer la CI (<code>config.yaml</code> mal placé)</td><td>Faible</td><td>Moyen à élevé</td><td>Aucune</td></tr>
+      <tr><td><span class="pill high">🟠 Haute</span></td><td>Sélection de cible côté joueur</td><td>Moyenne</td><td>Élevé</td><td>Aucune (moteur déjà prêt)</td></tr>
+      <tr><td><span class="pill high">🟠 Haute</span></td><td>Exposer la dépense de BP dans l'UI</td><td>Moyenne</td><td>Élevé</td><td>Aucune</td></tr>
+      <tr><td><span class="pill high">🟠 Haute</span></td><td>Suite après victoire/défaite</td><td>Faible à moyenne</td><td>Élevé</td><td>Conception de la boucle d'exploration</td></tr>
+      <tr><td><span class="pill high">🟠 Haute</span></td><td>Boucle minimale d'exploration (GameScene)</td><td>Élevée</td><td>Élevé</td><td>Assets de carte/tuiles</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>Connecter DialogueScene au flux de jeu + contenu</td><td>Moyenne</td><td>Moyen</td><td>Boucle d'exploration</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>IA ennemie variée</td><td>Moyenne</td><td>Moyen</td><td>Plus de compétences/ennemis</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>Utilisation des IP (ultimes)</td><td>Moyenne à élevée</td><td>Moyen</td><td>Affichage IP dans le HUD</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>Enrichissement du contenu (héros, ennemis, skills)</td><td>Faible / unité</td><td>Élevé</td><td>Aucune</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>Assets graphiques de personnages/ennemis</td><td>Élevée</td><td>Élevé</td><td>Décision artistique</td></tr>
+      <tr><td><span class="pill low">🟢 Faible</span></td><td>Effets sonores (SFX)</td><td>Faible</td><td>Faible à moyen</td><td>Aucune</td></tr>
+      <tr><td><span class="pill low">🟢 Faible</span></td><td>Écran d'options</td><td>Faible</td><td>Faible</td><td>Aucune</td></tr>
+      <tr><td><span class="pill low">🟢 Faible</span></td><td>Tests automatisés (formulas/combat)</td><td>Faible à moyenne</td><td>Moyen (long terme)</td><td>Aucune</td></tr>
+      <tr><td><span class="pill low">🟢 Faible</span></td><td>Statuts (poison, stun, buffs)</td><td>Élevée</td><td>Moyen</td><td>Combat stabilisé (ciblage, BP, fin de combat)</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">07</span>Notes sur 10</h2>
+  <div class="grade-grid">
+    <div class="grade-card"><div class="score">6</div><div class="criterion">Architecture</div></div>
+    <div class="grade-card"><div class="score">6</div><div class="criterion">Qualité du code</div></div>
+    <div class="grade-card"><div class="score">5</div><div class="criterion">Maintenabilité</div></div>
+    <div class="grade-card"><div class="score">6</div><div class="criterion">Extensibilité</div></div>
+    <div class="grade-card"><div class="score">3</div><div class="criterion">Gameplay</div></div>
+    <div class="grade-card"><div class="score">7</div><div class="criterion">Lisibilité</div></div>
+    <div class="grade-card"><div class="score">5</div><div class="criterion">Organisation</div></div>
+  </div>
+
+  <h2><span class="num">08</span>Recommandations</h2>
+  <div class="callout good">
+    <strong>Avant d'ajouter du contenu :</strong> trancher le sort du module orphelin et mettre à jour le <code>README.md</code>. Ces deux actions sont peu coûteuses et lèvent l'essentiel de la confusion architecturale actuelle.
+  </div>
+  <div class="callout">
+    <strong>Avant d'enrichir le combat :</strong> fermer les boucles existantes (ciblage joueur, dépense de BP visible, suite après victoire/défaite) plutôt que d'ajouter de nouvelles mécaniques (statuts, IP) sur des fondations encore incomplètes.
+  </div>
+  <div class="callout">
+    <strong>Pour sécuriser la suite :</strong> ajouter des tests unitaires sur <code>formulas.ts</code> et <code>combat.ts</code> avant d'enrichir significativement le contenu (plus de compétences/ennemis augmente rapidement les combinaisons à vérifier manuellement).
+  </div>
+
+  <footer>
+    Audit documentaire généré le 19 juillet 2026 à partir du contenu réel du dépôt (hors <code>node_modules/</code> et <code>.git/</code>). Aucun fichier source, de configuration ou d'asset n'a été modifié pour produire ce rapport. Voir les fichiers <code>.md</code> du dossier <code>audit/</code> pour le détail complet de chaque section.
+  </footer>
+
+</div>
+</body>
+</html>

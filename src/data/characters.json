@@ -1,40 +1,82 @@
 [
   {
-    "id": "olberic",
-    "name": "Olberic",
-    "job": "warrior",
+    "id": "ochette",
+    "name": "Ochette",
+    "job": "hunter",
+    "spriteKey": "spr_ochette",
     "stats": {
-      "hp": 120,
+      "hp": 95,
       "sp": 30,
       "bp": 1,
-      "ip": 0,
-      "atk": 36,
-      "mag": 12,
-      "def": 20,
+      "lp": 0,
+      "atk": 30,
+      "mag": 15,
+      "def": 16,
       "res": 14,
+      "spd": 24,
+      "eva": 12,
+      "acc": 98,
+      "lck": 6
+    }
+  },
+  {
+    "id": "hikari",
+    "name": "Hikari",
+    "job": "warrior",
+    "spriteKey": "spr_hikari",
+    "stats": {
+      "hp": 130,
+      "sp": 25,
+      "bp": 1,
+      "lp": 0,
+      "atk": 38,
+      "mag": 10,
+      "def": 22,
+      "res": 15,
       "spd": 18,
-      "eva": 10,
+      "eva": 8,
       "acc": 100,
       "lck": 5
     }
   },
   {
-    "id": "cyrus",
-    "name": "Cyrus",
-    "job": "scholar",
+    "id": "agnea",
+    "name": "Agnea",
+    "job": "dancer",
+    "spriteKey": "spr_agnea",
     "stats": {
-      "hp": 80,
-      "sp": 42,
+      "hp": 85,
+      "sp": 35,
       "bp": 1,
-      "ip": 0,
-      "atk": 12,
-      "mag": 40,
-      "def": 10,
-      "res": 22,
+      "lp": 0,
+      "atk": 16,
+      "mag": 24,
+      "def": 12,
+      "res": 18,
+      "spd": 26,
+      "eva": 14,
+      "acc": 97,
+      "lck": 8
+    }
+  },
+  {
+    "id": "castti",
+    "name": "Castti",
+    "job": "apothecary",
+    "spriteKey": "spr_castti",
+    "stats": {
+      "hp": 90,
+      "sp": 38,
+      "bp": 1,
+      "lp": 0,
+      "atk": 14,
+      "mag": 28,
+      "def": 14,
+      "res": 20,
       "spd": 20,
-      "eva": 8,
+      "eva": 10,
       "acc": 98,
-      "lck": 7
+      "lck": 6
     }
   }
 ]

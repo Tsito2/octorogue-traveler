@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Plan technique — Octorogue Traveler (Roguelite)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#0b0e14;
+    --bg-panel:#12161f;
+    --bg-panel-2:#171c27;
+    --bg-code:#0e1218;
+    --border:#242b3a;
+    --text:#e6e9f0;
+    --text-dim:#9aa3b5;
+    --accent:#4a90e2;
+    --accent-2:#8e6bf0;
+    --green:#3ecf8e;
+    --yellow:#e2b93b;
+    --red:#e2564a;
+    --orange:#e2884a;
+    --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 90px;}
+  header.top{
+    padding:44px 24px;
+    background:radial-gradient(1200px 400px at 15% -10%, rgba(74,144,226,0.18), transparent),
+               radial-gradient(1000px 400px at 90% -20%, rgba(142,107,240,0.16), transparent),
+               var(--bg-panel);
+    border-bottom:1px solid var(--border);
+  }
+  header.top .inner{max-width:1180px;margin:0 auto;}
+  .eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:600;}
+  h1{font-size:30px;margin:8px 0 8px;}
+  .subtitle{color:var(--text-dim);font-size:15px;max-width:760px;}
+  .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg-panel-2);border:1px solid var(--border);padding:6px 12px;border-radius:999px;font-size:13px;color:var(--text-dim);}
+
+  h2{font-size:22px;margin:56px 0 6px;border-bottom:1px solid var(--border);padding-bottom:12px;}
+  h2 .num{color:var(--accent);margin-right:8px;}
+  h3{font-size:16.5px;margin:28px 0 10px;color:var(--text);}
+  h4{font-size:14.5px;margin:18px 0 8px;color:var(--accent-2);}
+  p{color:var(--text-dim);}
+  p.lead{color:var(--text);font-size:15px;}
+  ul,ol{color:var(--text-dim);}
+  li{margin-bottom:6px;}
+  strong{color:var(--text);}
+
+  .callout{border-left:3px solid var(--accent);background:var(--bg-panel-2);padding:14px 16px;border-radius:6px;margin:16px 0;color:var(--text-dim);font-size:14px;}
+  .callout.warn{border-left-color:var(--red);}
+  .callout.good{border-left-color:var(--green);}
+  .callout.open{border-left-color:var(--yellow);}
+  .callout strong{color:var(--text);}
+
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--text-dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  td{color:var(--text);}
+  tr:last-child td{border-bottom:none;}
+
+  code{background:var(--bg-panel-2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:12.5px;font-family:var(--mono);color:#c9d6f0;}
+  pre{
+    background:var(--bg-code);border:1px solid var(--border);border-radius:10px;
+    padding:16px 18px;overflow-x:auto;margin-top:12px;font-size:13px;line-height:1.55;
+  }
+  pre code{background:none;border:none;padding:0;color:#c9d6f0;}
+  .tok-key{color:#8ab4f8;}
+  .tok-str{color:#9ecf8e;}
+  .tok-num{color:#e2b93b;}
+  .tok-com{color:#6b7385;font-style:italic;}
+  .tok-new{color:#f2a154;font-weight:700;}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .pill.crit{background:rgba(226,86,74,.15);color:var(--red);border:1px solid rgba(226,86,74,.35);}
+  .pill.high{background:rgba(226,136,74,.15);color:var(--orange);border:1px solid rgba(226,136,74,.35);}
+  .pill.mid{background:rgba(226,185,59,.15);color:var(--yellow);border:1px solid rgba(226,185,59,.35);}
+  .pill.low{background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.35);}
+
+  .phase{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-top:20px;}
+  .phase .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+  .phase .head .title{font-size:17px;font-weight:700;color:var(--text);}
+  .phase .goal{color:var(--text-dim);font-size:13.5px;margin-bottom:14px;}
+  .phase ul{margin:0;padding-left:20px;}
+  .phase .files{margin-top:10px;font-size:12.5px;color:var(--text-dim);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px;}
+  @media (max-width:860px){.grid2{grid-template-columns:1fr;}}
+
+  .diagram-wrap{overflow-x:auto;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px;}
+  svg text{fill:var(--text);font-family:var(--font);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-dim);font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="eyebrow">Plan technique — livrable documentaire uniquement</div>
+    <h1>Octorogue Traveler → Roguelite tactique</h1>
+    <p class="subtitle">Feuille de route pour faire évoluer le prototype actuel (menu → combat de démonstration) vers la vision cible : boucle roguelike, gestion d'équipe jusqu'à 8 personnages, Break/Boost/Pouvoir Latent/Duo Swap. Priorité absolue donnée aux structures Personnages / Classes / Compétences ; les boss sont traités en dernier.</p>
+    <div class="badge-row">
+      <span class="badge">Jeu 100% hors-ligne, JSON local</span>
+      <span class="badge">Aucun code TypeScript modifié par ce plan</span>
+      <span class="badge">Livrable unique : plan_octorogue.html</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2><span class="num">01</span>Résumé de l'analyse de l'existant</h2>
+  <p class="lead">Le dépôt contient déjà un moteur de combat fonctionnel et data-driven — une base réutilisable solide pour la vision roguelite — mais il coexiste avec un module de code mort qu'il faut trancher avant d'empiler de nouvelles mécaniques dessus.</p>
+
+  <div class="grid2">
+    <div class="phase" style="margin-top:0;">
+      <div class="head"><span class="title">✅ Réutilisable tel quel</span></div>
+      <ul>
+        <li><code>src/core/stats.ts</code> — modèle <code>BattleStats</code>/<code>Stats</code>/<code>Resources</code>, bonne base d'extension pour rangée et Pouvoir Latent.</li>
+        <li><code>src/core/skills.ts</code>, <code>jobs.ts</code>, <code>enemies.ts</code> — types de données déjà pensés en dictionnaires indexés par <code>id</code>, extensibles sans casser l'existant.</li>
+        <li><code>src/core/formulas.ts</code> — calcul de dégâts, précision/esquive, critique, Break déjà implémentés et isolés en fonctions pures : point d'ancrage naturel pour Boost, Break variable et Pouvoir Latent.</li>
+        <li><code>src/core/combat.ts</code> (<code>CombatEngine</code>) — orchestrateur de tour déjà structuré autour d'un type <code>Action</code> extensible.</li>
+        <li><code>src/data/*.json</code> + wrappers <code>.ts</code> — pipeline JSON → dictionnaire typé déjà en place et réutilisé à l'identique sur 4 fichiers : c'est exactement le pattern à répliquer pour les nouvelles données (routes, formations, nœuds de run).</li>
+      </ul>
+    </div>
+    <div class="phase" style="margin-top:0;">
+      <div class="head"><span class="title">⚠️ À nettoyer avant d'étendre</span></div>
+      <ul>
+        <li><code>src/characters/Character.ts</code>, <code>Hikari.ts</code> et <code>src/combat/*.ts</code> (hors scènes) + <code>src/ui/HUD.ts</code>/<code>DialogueBox.ts</code> : module orphelin, <strong>importé par aucun fichier actif</strong>. Duplique le moteur de combat avec une API divergente (classes <code>Character</code>/<code>Party</code>/<code>BattleManager</code> vs le système actuel <code>BattleStats</code>/<code>CombatEngine</code>).</li>
+        <li><code>README.md</code> racine obsolète (arborescence décrite ne correspond plus au dépôt réel).</li>
+        <li><code>config.yaml</code> à la racine : workflow CI mal placé (devrait être dans <code>.github/workflows/</code>), inopérant en l'état.</li>
+        <li>Le champ <code>ip</code>/<code>maxIP</code> existe déjà dans <code>Resources</code> mais n'est ni affiché ni consommé : c'est la base technique du futur <strong>Pouvoir Latent</strong>, à renommer/finaliser plutôt qu'à recréer.</li>
+        <li>L'action <code>"defend"</code> est codée en dur dans <code>CombatEngine.resolveAction</code> plutôt que définie comme compétence de donnée — pattern à éviter pour les futures mécaniques (Burst, Duo Combo) qui doivent rester pilotées par JSON.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Décision structurante :</strong> ne pas construire les nouvelles mécaniques (Duo Swap, Burst) par-dessus le module orphelin. Toute nouvelle logique de combat doit s'appuyer exclusivement sur <code>core/combat.ts</code> + <code>core/formulas.ts</code> + <code>core/stats.ts</code>, qui sont le seul moteur réellement exécuté par le jeu.
+  </div>
+
+  <h2><span class="num">02</span>Actions immédiates (dette technique)</h2>
+  <p>Préalable à toute nouvelle fonctionnalité — coût faible, déblocage immédiat de la suite du plan.</p>
+
+  <table>
+    <thead><tr><th>Priorité</th><th>Action</th><th>Pourquoi maintenant</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill crit">🔴 Critique</span></td><td>Trancher le module orphelin : supprimer, ou déplacer dans <code>_legacy/</code> avec un <code>README</code> explicite s'il doit servir de référence ponctuelle</td><td>Évite qu'une nouvelle mécanique soit branchée par erreur sur le mauvais moteur de combat</td></tr>
+      <tr><td><span class="pill crit">🔴 Critique</span></td><td>Renommer <code>ip</code>/<code>maxIP</code> → <code>lp</code>/<code>maxLP</code> dans <code>core/stats.ts</code> (et usages associés)</td><td>Clarifie dès maintenant que cette ressource porte le futur Pouvoir Latent, évite une confusion de nommage pendant la Phase 2</td></tr>
+      <tr><td><span class="pill high">🟠 Haute</span></td><td>Réécrire <code>README.md</code> pour décrire l'architecture réelle + la vision roguelite</td><td>Document de référence pour toute l'équipe pendant les phases suivantes</td></tr>
+      <tr><td><span class="pill mid">🟡 Moyenne</span></td><td>Déplacer/corriger <code>config.yaml</code> (CI) et ajouter un script <code>lint</code> réel</td><td>Utile mais non bloquant pour le travail sur les données de gameplay</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">03</span>Roadmap technique</h2>
+  <p>Quatre phases séquentielles. La Phase 1 (Personnages / Classes / Compétences) est le socle non négociable de tout le reste, conformément à la priorité donnée par le projet. Les boss (Phase 4) sont volontairement traités en dernier.</p>
+
+  <div class="phase">
+    <div class="head"><span class="title">Phase 0 — Nettoyage &amp; fondations saines</span><span class="pill crit">🔴 Critique</span></div>
+    <div class="goal">Objectif : partir d'une base de code à moteur unique avant d'ajouter la moindre mécanique.</div>
+    <ul>
+      <li>Exécuter les actions immédiates de la section 02.</li>
+      <li>Geler l'interface publique de <code>CombatEngine</code>/<code>formulas.ts</code> comme unique point d'extension pour toutes les mécaniques à venir.</li>
+    </ul>
+    <div class="files">Fichiers concernés : <code>src/characters/*</code>, <code>src/combat/*</code> (hors scènes), <code>src/ui/*</code>, <code>README.md</code>, <code>config.yaml</code>, <code>src/core/stats.ts</code></div>
+  </div>
+
+  <div class="phase">
+    <div class="head"><span class="title">Phase 1 — Fondations Personnages / Classes / Compétences</span><span class="pill crit">🔴 Critique — priorité absolue du projet</span></div>
+    <div class="goal">Objectif : porter les structures de données au niveau requis par la vision cible <em>avant</em> tout travail sur la boucle roguelite ou les boss.</div>
+    <ul>
+      <li>Étendre l'interface <code>Skill</code> : <code>breakPower</code>, <code>lpGain</code>, <code>isBurst</code>, <code>requiredRow</code>, <code>isDuoCombo</code> (détail schéma en section 04).</li>
+      <li>Étendre l'interface <code>Job</code> : <code>burstSkillId</code>, <code>preferredRow</code>, <code>maxBP</code> (actuellement codé en dur à <code>5</code> dans <code>core/encounters.ts</code> — à faire porter par le job).</li>
+      <li>Étendre <code>CharacterTemplate</code> : <code>startingRow</code>, <code>duoAffinity</code>, <code>recruitRouteId</code>, <code>subJob</code> (optionnel, réservé post-MVP).</li>
+      <li>Étoffer le contenu de donnée : passer de 2 à un roster cible de 8 personnages jouables, d'au moins 4 à 6 jobs (contre 2 actuellement), et d'une bibliothèque de compétences couvrant chaque job avec au moins une compétence de soin/buff réelle (le type <code>"support"</code> existe déjà dans <code>SkillCategory</code> mais 0 compétence l'utilise aujourd'hui) et une compétence Burst par job.</li>
+      <li>Ajouter le traitement effectif des cibles <code>"single_ally"</code> et <code>"self"</code> dans le moteur, actuellement définies dans le type <code>SkillTarget</code> mais jamais gérées par <code>CombatEngine</code> — prérequis pour toute compétence de soin/buff.</li>
+    </ul>
+    <div class="files">Fichiers concernés : <code>src/core/skills.ts</code>, <code>src/core/jobs.ts</code>, <code>src/data/characters.ts</code>, <code>src/data/*.json</code>, <code>src/core/encounters.ts</code></div>
+  </div>
+
+  <div class="phase">
+    <div class="head"><span class="title">Phase 2 — Calculateurs de combat : Break, Boost, Pouvoir Latent, Duo Swap</span><span class="pill high">🟠 Haute</span></div>
+    <div class="goal">Objectif : faire vivre dans le moteur les structures posées en Phase 1.</div>
+    <ul>
+      <li><strong>Break :</strong> dans <code>formulas.ts::applyBreak</code>, remplacer le décrément fixe de bouclier (-1) par <code>skill.breakPower ?? 1</code>.</li>
+      <li><strong>Boost (BP) :</strong> exposer réellement <code>bpSpent</code> dans <code>CombatScene</code> (actuellement toujours <code>0</code> dans tous les appels) via un contrôle +/- avant validation d'une compétence ; utiliser <code>job.maxBP</code> issu de la Phase 1 au lieu de la constante codée en dur.</li>
+      <li><strong>Pouvoir Latent (Burst) :</strong> finaliser <code>gainLP</code> (basé sur <code>skill.lpGain</code>, avec repli sur les constantes actuelles <code>IP_ON_DAMAGE</code>/<code>IP_ON_BREAK</code> renommées), ajouter <code>canBurst(actor)</code> (<code>lp >= maxLP</code>) et une résolution <code>resolveBurst</code> qui consomme toute la jauge et exécute la compétence <code>job.burstSkillId</code> avec un multiplicateur dédié.</li>
+      <li><strong>Duo Swap :</strong> ajouter <code>row: "front" | "back"</code> et <code>duoPartnerId?: string</code> à <code>BattleStats</code> ; ajouter un type d'action <code>"swap"</code> dans <code>CombatEngine</code> pour échanger la rangée d'un binôme ; ajouter un type d'action <code>"duoCombo"</code> qui déclenche une compétence marquée <code>isDuoCombo</code> lorsque les deux membres du binôme sont vivants et en rangée avant.</li>
+    </ul>
+    <div class="callout open">
+      <strong>Point de conception ouvert (à valider avant implémentation) :</strong> le Duo Combo doit-il être disponible dès que les deux membres sont vivants en rangée avant (comme une option de menu supplémentaire), ou nécessiter une jauge de charge dédiée au binôme (fidèle à Octopath Traveler II) ? Ce choix impacte directement le schéma <code>duoPairs</code> proposé en section 04 (ajout probable d'un champ <code>comboGauge</code> si la seconde option est retenue).
+    </div>
+    <div class="files">Fichiers concernés : <code>src/core/formulas.ts</code>, <code>src/core/combat.ts</code>, <code>src/core/stats.ts</code>, <code>src/scenes/CombatScene.ts</code></div>
+  </div>
+
+  <div class="phase">
+    <div class="head"><span class="title">Phase 3 — Boucle roguelite (rencontres, récompenses, routes)</span><span class="pill mid">🟡 Moyenne</span></div>
+    <div class="goal">Objectif : assembler les fondations des Phases 1-2 en une boucle de run jouable.</div>
+    <ul>
+      <li>Nouvelle donnée <code>RunNode</code>/<code>nodes.json</code> : graphe de rencontres (combat, combat d'élite, boss, récompense, repos, route).</li>
+      <li>Nouvelle donnée <code>routes.json</code> : événements de recrutement ou d'échange de personnage, condition de déblocage (ex. profondeur de run minimale).</li>
+      <li>Structure de <code>RunState</code> (roster débloqué ce run, formation active, monnaie, nœuds franchis) — état de session, pas nécessairement persistant tant que la sauvegarde n'est pas priorisée.</li>
+      <li>Écran de sélection du personnage de départ (nouvelle scène ou extension de <code>MainMenuScene</code>).</li>
+      <li>Génération simple de rencontres à partir de <code>enemies.json</code> — dépend en parallèle de l'enrichissement du contenu ennemi (actuellement 1 seul ennemi défini), qui reste secondaire par rapport à la Phase 1 mais doit progresser avant que cette phase soit jouable.</li>
+    </ul>
+    <div class="files">Fichiers concernés (nouveaux) : <code>src/data/nodes.json</code>, <code>src/data/routes.json</code>, <code>src/core/run.ts</code> (nouveau), <code>src/scenes/*</code></div>
+  </div>
+
+  <div class="phase">
+    <div class="head"><span class="title">Phase 4 — Boss et équilibrage</span><span class="pill low">🟢 Différée volontairement</span></div>
+    <div class="goal">Objectif : une fois le socle Personnages/Classes/Compétences et la boucle roguelite stables, spécialiser le contenu de fin de run.</div>
+    <ul>
+      <li>Extension de <code>EnemyTemplate</code> pour les boss : patterns d'attaque multiples, phases de Break spécifiques, éventuellement plusieurs boucliers par élément.</li>
+      <li>Équilibrage global des stats/compétences sur la base des données de jeu accumulées pendant les Phases 1-3.</li>
+      <li>Explicitement hors scope tant que les Phases 1-3 ne sont pas validées, conformément à la priorité donnée par le projet.</li>
+    </ul>
+  </div>
+
+  <h2><span class="num">04</span>Architecture de données ciblée</h2>
+  <p>Extension du pattern JSON + wrapper TypeScript déjà en place dans <code>src/data/</code>. Les champs marqués <span class="tok-new">NOUVEAU</span> dans les exemples ci-dessous n'existent pas encore dans le dépôt actuel ; tout le reste correspond aux interfaces déjà présentes dans <code>src/core/</code>.</p>
+
+  <h3>Skill — <code>src/core/skills.ts</code> / <code>src/data/skills.json</code></h3>
+  <pre><code><span class="tok-key">interface</span> Skill {
+  id: <span class="tok-key">string</span>;
+  name: <span class="tok-key">string</span>;
+  type: <span class="tok-str">"physical"</span> | <span class="tok-str">"magical"</span> | <span class="tok-str">"support"</span>;
+  element: DamageType | <span class="tok-key">null</span>;
+  power: <span class="tok-key">number</span>;
+  spCost: <span class="tok-key">number</span>;
+  bpScaling?: <span class="tok-str">"power"</span> | <span class="tok-str">"hits"</span>;
+  target: <span class="tok-str">"single_enemy"</span> | <span class="tok-str">"single_ally"</span> | <span class="tok-str">"self"</span>;
+  tags?: DamageType[];
+  breakPower: <span class="tok-key">number</span>;              <span class="tok-com">// NOUVEAU — remplace le -1 fixe codé en dur dans formulas.ts</span>
+  lpGain?: <span class="tok-key">number</span>;                 <span class="tok-com">// NOUVEAU — remplace le champ "ipGain" documenté mais jamais implémenté</span>
+  isBurst?: <span class="tok-key">boolean</span>;               <span class="tok-com">// NOUVEAU — compétence de Pouvoir Latent (consomme lp === maxLP)</span>
+  requiredRow?: <span class="tok-str">"front"</span> | <span class="tok-str">"back"</span> | <span class="tok-str">"any"</span>;  <span class="tok-com">// NOUVEAU — contrainte de rangée</span>
+  isDuoCombo?: <span class="tok-key">boolean</span>;            <span class="tok-com">// NOUVEAU — nécessite un binôme actif en rangée avant</span>
+}</code></pre>
+
+  <h3>Job — <code>src/core/jobs.ts</code> / <code>src/data/jobs.json</code></h3>
+  <pre><code><span class="tok-key">interface</span> Job {
+  id: <span class="tok-key">string</span>;
+  name: <span class="tok-key">string</span>;
+  weapons: DamageType[];
+  elements: DamageType[];
+  skills: <span class="tok-key">string</span>[];
+  burstSkillId?: <span class="tok-key">string</span>;      <span class="tok-com">// NOUVEAU — référence vers une Skill avec isBurst: true</span>
+  preferredRow?: <span class="tok-str">"front"</span> | <span class="tok-str">"back"</span>;  <span class="tok-com">// NOUVEAU</span>
+  maxBP?: <span class="tok-key">number</span>;             <span class="tok-com">// NOUVEAU — remplace la constante 5 codée en dur dans encounters.ts</span>
+}</code></pre>
+
+  <h3>CharacterTemplate — <code>src/data/characters.ts</code> / <code>characters.json</code></h3>
+  <pre><code><span class="tok-key">interface</span> CharacterTemplate {
+  id: <span class="tok-key">string</span>;
+  name: <span class="tok-key">string</span>;
+  job: <span class="tok-key">string</span>;
+  stats: CharacterTemplateStats;
+  subJob?: <span class="tok-key">string</span> | <span class="tok-key">null</span>;         <span class="tok-com">// NOUVEAU — réservé post-MVP (job secondaire)</span>
+  startingRow?: <span class="tok-str">"front"</span> | <span class="tok-str">"back"</span>;  <span class="tok-com">// NOUVEAU</span>
+  duoAffinity?: <span class="tok-key">string</span>[];         <span class="tok-com">// NOUVEAU — ids de partenaires de duo privilégiés</span>
+  recruitRouteId?: <span class="tok-key">string</span> | <span class="tok-key">null</span>;  <span class="tok-com">// NOUVEAU — lien vers routes.json (Phase 3)</span>
+}</code></pre>
+
+  <h3>BattleStats (runtime) — <code>src/core/stats.ts</code></h3>
+  <pre><code><span class="tok-key">interface</span> Resources {
+  hp, sp, bp, shield, maxBP: <span class="tok-key">number</span>;
+  lp: <span class="tok-key">number</span>;       <span class="tok-com">// NOUVEAU nom — anciennement "ip"</span>
+  maxLP: <span class="tok-key">number</span>;    <span class="tok-com">// NOUVEAU nom — anciennement "maxIP"</span>
+}
+
+<span class="tok-key">interface</span> BattleStats {
+  <span class="tok-com">// ...champs existants inchangés (id, name, faction, stats, weaknesses, isBroken, breakTimer, skillIds)</span>
+  row: <span class="tok-str">"front"</span> | <span class="tok-str">"back"</span>;         <span class="tok-com">// NOUVEAU</span>
+  duoPartnerId?: <span class="tok-key">string</span>;         <span class="tok-com">// NOUVEAU</span>
+}</code></pre>
+
+  <h3>Action (moteur) — <code>src/core/combat.ts</code></h3>
+  <pre><code><span class="tok-key">interface</span> Action {
+  actorId: <span class="tok-key">string</span>;
+  skillId: <span class="tok-key">string</span>;
+  targetId: <span class="tok-key">string</span>;
+  bpSpent?: <span class="tok-key">number</span>;
+  type?: <span class="tok-str">"skill"</span> | <span class="tok-str">"swap"</span> | <span class="tok-str">"duoCombo"</span> | <span class="tok-str">"burst"</span>;  <span class="tok-com">// NOUVEAU</span>
+  partnerId?: <span class="tok-key">string</span>;    <span class="tok-com">// NOUVEAU — requis pour "swap" et "duoCombo"</span>
+}</code></pre>
+
+  <h3>Nouvelles données — Formation &amp; Routes (Phase 3)</h3>
+  <pre><code><span class="tok-com">// PartyFormation — état de run, jusqu'à 8 personnages au total</span>
+<span class="tok-key">interface</span> PartyFormation {
+  frontRow: <span class="tok-key">string</span>[];   <span class="tok-com">// max 2</span>
+  backRow: <span class="tok-key">string</span>[];    <span class="tok-com">// max 2</span>
+  reserve: <span class="tok-key">string</span>[];    <span class="tok-com">// jusqu'à 4 supplémentaires (roster total = 8)</span>
+  duoPairs: { a: <span class="tok-key">string</span>; b: <span class="tok-key">string</span> }[];
+}
+
+<span class="tok-com">// routes.json — recrutement / échange en cours de run</span>
+{
+  <span class="tok-str">"id"</span>: <span class="tok-str">"route_frostpeak"</span>,
+  <span class="tok-str">"type"</span>: <span class="tok-str">"recruit"</span>,       <span class="tok-com">// "recruit" | "swap" | "duo_unlock"</span>
+  <span class="tok-str">"characterId"</span>: <span class="tok-str">"h_ryn"</span>,
+  <span class="tok-str">"unlockDepth"</span>: <span class="tok-num">3</span>
+}</code></pre>
+
+  <h3>Aperçu visuel — formation front/back et Duo Swap</h3>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 1000 220" width="100%" height="220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#5b6478"/>
+        </marker>
+      </defs>
+      <text x="20" y="26" font-size="12" fill="#9aa3b5">RANGÉE AVANT (front)</text>
+      <rect x="20" y="36" width="150" height="60" rx="10" fill="#171c27" stroke="#4a90e2"/>
+      <text x="95" y="70" font-size="13" text-anchor="middle">Olberic</text>
+      <rect x="190" y="36" width="150" height="60" rx="10" fill="#171c27" stroke="#4a90e2"/>
+      <text x="265" y="70" font-size="13" text-anchor="middle">Cyrus</text>
+
+      <text x="20" y="132" font-size="12" fill="#9aa3b5">RANGÉE ARRIÈRE (back)</text>
+      <rect x="20" y="142" width="150" height="60" rx="10" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="95" y="176" font-size="13" text-anchor="middle">H'aanit</text>
+      <rect x="190" y="142" width="150" height="60" rx="10" fill="#171c27" stroke="#8e6bf0"/>
+      <text x="265" y="176" font-size="13" text-anchor="middle">Tressa</text>
+
+      <path d="M180,66 C185,110 185,110 180,152" fill="none" stroke="#3ecf8e" stroke-dasharray="4 3" marker-end="url(#arrowp)"/>
+      <text x="180" y="118" font-size="11" fill="#3ecf8e" text-anchor="middle">swap</text>
+
+      <rect x="420" y="60" width="230" height="100" rx="10" fill="#241a2e" stroke="#8e6bf0"/>
+      <text x="535" y="86" font-size="12" fill="#c9b6f0" text-anchor="middle">Duo Combo (Olberic + Cyrus)</text>
+      <text x="535" y="108" font-size="11" fill="#9aa3b5" text-anchor="middle">Actif si duoPartnerId réciproque</text>
+      <text x="535" y="126" font-size="11" fill="#9aa3b5" text-anchor="middle">+ les deux en rangée avant</text>
+      <text x="535" y="144" font-size="11" fill="#9aa3b5" text-anchor="middle">Skill.isDuoCombo === true</text>
+
+      <line x1="170" y1="66" x2="420" y2="90" stroke="#5b6478" marker-end="url(#arrowp)"/>
+      <line x1="340" y1="66" x2="420" y2="110" stroke="#5b6478" marker-end="url(#arrowp)"/>
+
+      <rect x="720" y="60" width="230" height="100" rx="10" fill="#2a2216" stroke="#e2b93b"/>
+      <text x="835" y="86" font-size="12" fill="#e2b93b" text-anchor="middle">Burst (Pouvoir Latent)</text>
+      <text x="835" y="108" font-size="11" fill="#9aa3b5" text-anchor="middle">Déclenché quand lp === maxLP</text>
+      <text x="835" y="126" font-size="11" fill="#9aa3b5" text-anchor="middle">Consomme toute la jauge</text>
+      <text x="835" y="144" font-size="11" fill="#9aa3b5" text-anchor="middle">Exécute job.burstSkillId</text>
+    </svg>
+  </div>
+
+  <div class="callout good">
+    <strong>Cohérence avec l'existant :</strong> chaque nouveau champ proposé est optionnel (<code>?</code>) ou doté d'une valeur de repli, afin que les données actuelles (<code>characters.json</code>, <code>jobs.json</code>, <code>skills.json</code>, <code>enemies.json</code>) restent valides sans migration bloquante pendant la transition.
+  </div>
+
+  <h2><span class="num">05</span>Rappel de contrainte</h2>
+  <p>Ce document est un plan d'action, pas une implémentation. Aucun fichier <code>.ts</code> ni JSON de <code>src/</code> n'a été modifié pour le produire. La mise en œuvre (Phases 0 à 4) nécessite une validation explicite avant tout développement.</p>
+
+  <footer>
+    Plan technique généré le 19 juillet 2026 à partir de l'analyse du dépôt et de l'audit précédent (<code>audit/</code>). Livrable unique de cette tâche : <code>plan_octorogue.html</code> à la racine du projet.
+  </footer>
+
+</div>
+</body>
+</html>

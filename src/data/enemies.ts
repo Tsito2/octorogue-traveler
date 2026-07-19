@@ -21,11 +21,12 @@ export const enemies: EnemyDictionary = enemiesJson.reduce((acc, enemy) => {
         weaknesses: enemy.weaknesses,
         shield: enemy.shield,
         skills: enemy.skills,
-        ipReward: 15,
+        lpReward: 15,
         resourceDefaults: {
             bp: enemy.stats.bp,
-            ip: enemy.stats.ip,
+            lp: enemy.stats.lp,
         },
+        spriteKey: (enemy as { spriteKey?: string }).spriteKey,
     } as EnemyDictionary[keyof EnemyDictionary];
     return acc;
 }, {} as EnemyDictionary);

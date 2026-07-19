@@ -7,7 +7,10 @@
     "power": 1.0,
     "spCost": 0,
     "bpScaling": "power",
-    "target": "single_enemy"
+    "breakPower": 1,
+    "target": "single_enemy",
+    "requiredRow": "any",
+    "lpGain": 8
   },
   {
     "id": "fireball",
@@ -17,6 +20,46 @@
     "power": 1.4,
     "spCost": 10,
     "bpScaling": "power",
-    "target": "single_enemy"
+    "breakPower": 1,
+    "target": "single_enemy",
+    "requiredRow": "any",
+    "lpGain": 12
+  },
+  {
+    "id": "duo_strike",
+    "name": "Frappe en Duo",
+    "type": "physical",
+    "element": null,
+    "power": 1.6,
+    "spCost": 6,
+    "breakPower": 2,
+    "target": "single_enemy",
+    "requiredRow": "front",
+    "isDuoCombo": true,
+    "lpGain": 15
+  },
+  {
+    "id": "warrior_burst",
+    "name": "Rugissement du Champion",
+    "type": "physical",
+    "element": null,
+    "power": 3.0,
+    "spCost": 0,
+    "breakPower": 3,
+    "target": "single_enemy",
+    "requiredRow": "any",
+    "isBurst": true
+  },
+  {
+    "id": "scholar_burst",
+    "name": "Éruption Arcanique",
+    "type": "magical",
+    "element": "fire",
+    "power": 3.2,
+    "spCost": 0,
+    "breakPower": 3,
+    "target": "single_enemy",
+    "requiredRow": "any",
+    "isBurst": true
   }
 ]

@@ -4,13 +4,46 @@
     "name": "Champion",
     "weapons": ["sword", "spear"],
     "elements": [],
-    "skills": ["basic_attack"]
+    "skills": ["basic_attack", "duo_strike"],
+    "maxBP": 5,
+    "burstSkillId": "warrior_burst",
+    "preferredRow": "front"
   },
   {
     "id": "scholar",
     "name": "Érudit",
     "weapons": ["staff"],
     "elements": ["fire", "ice", "lightning"],
-    "skills": ["fireball"]
+    "skills": ["fireball", "duo_strike"],
+    "maxBP": 5,
+    "burstSkillId": "scholar_burst",
+    "preferredRow": "back"
+  },
+  {
+    "id": "hunter",
+    "name": "Chasseur",
+    "weapons": ["bow"],
+    "elements": [],
+    "skills": ["basic_attack", "duo_strike"],
+    "maxBP": 5,
+    "preferredRow": "back"
+  },
+  {
+    "id": "dancer",
+    "name": "Danseuse",
+    "weapons": ["dagger"],
+    "elements": ["light"],
+    "skills": ["basic_attack", "duo_strike"],
+    "maxBP": 5,
+    "preferredRow": "front"
+  },
+  {
+    "id": "apothecary",
+    "name": "Apothicaire",
+    "weapons": ["axe"],
+    "elements": ["ice"],
+    "skills": ["basic_attack", "duo_strike"],
+    "maxBP": 5,
+    "preferredRow": "back"
   }
 ]
